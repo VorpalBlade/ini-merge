@@ -164,30 +164,43 @@ mod keyring_transform {
     ///
     /// Arguments:
     /// * `service`: Which service name to look under
-    /// * `username`: The user name identifying the entry
+    /// * `user`: The user name identifying the entry
     ///
     /// Example args:
-    /// * service: "system"
-    /// * username: "konversation-login"
+    /// * service: "chezmoi-modify-manager"
+    /// * user: "konversation-login"
+    ///
+    /// To add a key compatible with the above service and user run a command like the following:
+    /// ```console
+    /// $ secret-tool store --label="Descriptive name" service chezmoi-modify-manager username konversation-login
+    /// ```
+    /// and enter the password when prompted
     #[derive(Debug)]
     pub struct TransformKeyring {
         service: String,
-        username: String,
+        user: String,
     }
 
     impl TransformKeyring {
-        pub fn new(service: String, username: String) -> Self {
-            Self { service, username }
+        pub fn new(service: String, user: String) -> Self {
+            Self { service, user }
         }
     }
 
     impl Transformer for TransformKeyring {
         fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
             let password: Option<_> = {
-                match keyring::Entry::new(self.service.as_str(), self.username.as_str()) {
-                    Ok(entry) => entry.get_password().ok(),
-                    err @ Err(_) => {
-                        eprintln!("Keyring error {err:?}");
+                match keyring::Entry::new(self.service.as_str(), self.user.as_str()) {
+                    Ok(entry) => match entry.get_password() {
+                        Ok(v) => Some(v),
+                        Err(err) => {
+                            eprintln!("Keyring lookup error: {err}");
+                            eprintln!("Keyring query: service={} user={}", self.service, self.user);
+                            None
+                        }
+                    },
+                    Err(err) => {
+                        eprintln!("Keyring error: {err}");
                         None
                     }
                 }
