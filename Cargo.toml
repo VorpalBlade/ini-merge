@@ -10,7 +10,7 @@ repository = "https://github.com/VorpalBlade/ini-merge"
 version = "0.1.0"
 
 [dependencies]
-ini-roundtrip = { version = "0.1.0", path = "../ini-roundtrip" }
+ini-roundtrip = "0.1.0"
 itertools = "0.10.5"
 keyring = { version = "2.0.1", optional = true }
 lending-iterator = { version = "0.1.7", default-features = false }
