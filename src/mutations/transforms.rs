@@ -14,7 +14,7 @@ use thiserror::Error;
 pub use keyring_transform::TransformKeyring;
 
 /// The action that a transform decides should happen for a line it processes.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum TransformerAction<'a> {
     /// No output
@@ -244,5 +244,57 @@ mod keyring_transform {
                 .ok_or(TransformerError::Construct("Failed to get user"))?;
             Ok(Self::new(service.to_string(), user.to_string()))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Property;
+
+    use super::*;
+
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn unsorted_lists() {
+        let t = TransformUnsortedLists::new(',');
+        let action = t.call(
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("a,b,c"),
+                raw: "b=a,b,c",
+            }),
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("c,a,b"),
+                raw: "b=c,a,b",
+            }),
+        );
+        assert_eq!(action, TransformerAction::Line(Cow::Borrowed("b=c,a,b")));
+    }
+
+    #[test]
+    fn kde_shortcut() {
+        let t = TransformKdeShortcut;
+        let action = t.call(
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("none,,Media volume down"),
+                raw: "b=none,,Media volume down",
+            }),
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("none,none,Media volume down"),
+                raw: "b=none,none,Media volume down",
+            }),
+        );
+        assert_eq!(
+            action,
+            TransformerAction::Line(Cow::Borrowed("b=none,none,Media volume down"))
+        );
     }
 }
