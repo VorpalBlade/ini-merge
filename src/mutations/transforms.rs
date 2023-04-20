@@ -156,11 +156,9 @@ mod keyring_transform {
 
     use super::{Transformer, TransformerAction, TransformerError};
 
-    /// Get value from keyring (kwallet or secret service). Useful for passwords
+    /// Get value from system keyring (secrets service). Useful for passwords
     /// etc that you do not want in your dotfiles repo, but sync via some more
     /// secure manner.
-    ///
-    /// Note! Requires the python library keyring.
     ///
     /// Arguments:
     /// * `service`: Which service name to look under
