@@ -14,10 +14,10 @@ ini-roundtrip = "0.1.2"
 itertools = "0.11.0"
 keyring = { version = "2.0.4", optional = true }
 lending-iterator = { version = "0.1.7", default-features = false }
-ouroboros = "0.17.0"
+ouroboros = "0.17.2"
 regex = "1.9.1"
-thiserror = "1.0.43"
+thiserror = "1.0.44"
 
 [dev-dependencies]
-indoc = "2.0.2"
+indoc = "2.0.3"
 pretty_assertions = "1.4.0"
