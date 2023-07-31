@@ -1,6 +1,6 @@
 use crate::mutations::{
     transforms::{TransformKdeShortcut, TransformUnsortedLists},
-    Action, MutationsBuilder,
+    Action, MutationsBuilder, SectionAction,
 };
 
 use indoc::indoc;
@@ -84,7 +84,7 @@ fn test_merge_ini() {
 
     // Test a bunch of different actions and matchers.
     let mutations = MutationsBuilder::new()
-        .add_ignore_section("s3")
+        .add_section_action("s3", SectionAction::Ignore)
         .add_literal_action("s1", "c", Action::Ignore)
         .add_literal_action("s2", "e", Action::Ignore)
         .add_literal_action(
