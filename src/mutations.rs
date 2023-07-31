@@ -168,7 +168,13 @@ impl MutationsBuilder {
                 .or_insert_with(|| HashSet::from_iter([key]));
             this
         }
-        inner(self, section.into(), key.into(), value.as_ref(), separator.as_ref())
+        inner(
+            self,
+            section.into(),
+            key.into(),
+            value.as_ref(),
+            separator.as_ref(),
+        )
     }
 
     /// Build the Mutations struct
