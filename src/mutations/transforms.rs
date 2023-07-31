@@ -138,12 +138,53 @@ impl Transformer for TransformKdeShortcut {
     }
 
     fn from_user_input(
-        _args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
+        args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
     ) -> Result<Self, TransformerError>
     where
         Self: Sized,
     {
-        Ok(Self)
+        if args.is_empty() {
+            Ok(Self)
+        } else {
+            Err(TransformerError::Construct("Unexpected arguments"))
+        }
+    }
+}
+
+/// Transform to set to a fixed value.
+///
+/// This is meant to be used together with templating, to override an entry
+/// only on some systems.
+///
+/// No arguments
+#[derive(Debug)]
+pub struct TransformSet {
+    raw: String,
+}
+
+impl TransformSet {
+    pub fn new(raw: String) -> Self {
+        Self { raw }
+    }
+}
+
+impl Transformer for TransformSet {
+    fn call<'a>(&self, _src: &InputData<'a>, _tgt: &InputData<'a>) -> TransformerAction<'a> {
+        TransformerAction::Line(Cow::Owned(self.raw.clone()))
+    }
+
+    fn from_user_input(
+        args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
+    ) -> Result<Self, TransformerError>
+    where
+        Self: Sized,
+    {
+        Ok(Self::new(
+            args.get("raw")
+                .map(|x| x.as_ref())
+                .ok_or(TransformerError::Construct("Failed to get raw entry"))?
+                .to_owned(),
+        ))
     }
 }
 
@@ -293,6 +334,29 @@ mod tests {
         assert_eq!(
             action,
             TransformerAction::Line(Cow::Borrowed("b=none,none,Media volume down"))
+        );
+    }
+
+    #[test]
+    fn set() {
+        let t = TransformSet::new("a = q".to_owned());
+        let action = t.call(
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("c"),
+                raw: "b=c",
+            }),
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some("d"),
+                raw: "b=d",
+            }),
+        );
+        assert_eq!(
+            action,
+            TransformerAction::Line(Cow::Owned("a = q".to_owned()))
         );
     }
 }
