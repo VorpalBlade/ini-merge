@@ -147,16 +147,18 @@ impl MutationsBuilder {
         section: impl Into<String>,
         key: impl Into<String>,
         value: impl AsRef<str>,
+        separator: impl AsRef<str>,
     ) -> Self {
         fn inner(
             mut this: MutationsBuilder,
             section: String,
             key: String,
             value: &str,
+            separator: &str,
         ) -> MutationsBuilder {
             this.literal_actions.insert(
                 section.clone() + "\0" + key.as_ref(),
-                Action::Transform(Box::new(TransformSet::new(key.clone() + " = " + value))),
+                Action::Transform(Box::new(TransformSet::new(key.clone() + separator + value))),
             );
             this.forced_keys
                 .entry(section)
@@ -166,7 +168,7 @@ impl MutationsBuilder {
                 .or_insert_with(|| HashSet::from_iter([key]));
             this
         }
-        inner(self, section.into(), key.into(), value.as_ref())
+        inner(self, section.into(), key.into(), value.as_ref(), separator.as_ref())
     }
 
     /// Build the Mutations struct
