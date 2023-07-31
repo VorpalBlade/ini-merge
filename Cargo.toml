@@ -7,7 +7,7 @@ keywords = ["ini", "config", "configuration", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
-version = "0.1.2"
+version = "0.2.0"
 
 [dependencies]
 ini-roundtrip = "0.1.2"
