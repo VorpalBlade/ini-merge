@@ -171,17 +171,31 @@ pub(crate) fn merge<'a>(
             target @ ini_roundtrip::Item::Property { key, val: _, raw } => {
                 // Bookkeeping
                 let action = mutations.find_action(&state.cur_section, key);
-                if let Action::Ignore = action {
-                    state.seen_keys.insert(key.into());
-                    state.emit_pending_lines();
-                    state.result.push(raw.into());
-                } else if let Some(src_val) = source.property(&SectionAndKey::new(
+                let src_property = source.property(&SectionAndKey::new(
                     Cow::Owned(state.cur_section.clone()),
                     Cow::Borrowed(key),
-                )) {
-                    state.seen_keys.insert(key.into());
-                    state.emit_pending_lines();
-                    state.emit_kv(action, key, Some(src_val), Some(target));
+                ));
+                match action {
+                    Action::Pass => {
+                        if let Some(src_val) = src_property {
+                            state.seen_keys.insert(key.into());
+                            state.emit_pending_lines();
+                            state.emit_kv(action, key, Some(src_val), Some(target));
+                        }
+                    }
+                    Action::Ignore => {
+                        state.seen_keys.insert(key.into());
+                        state.emit_pending_lines();
+                        state.result.push(raw.into());
+                    }
+                    Action::Delete => {
+                        // Nothing to do, just don't emit anything
+                    }
+                    Action::Transform(_) => {
+                        state.seen_keys.insert(key.into());
+                        state.emit_pending_lines();
+                        state.emit_kv(action, key, src_property, Some(target));
+                    }
                 }
             }
         }
