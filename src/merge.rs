@@ -54,7 +54,7 @@ impl MergeState {
     fn emit_non_target_lines(&mut self, source: &SourceIni, mutations: &Mutations) {
         if source.has_section(self.cur_section.as_str()) {
             match mutations.find_section_action(self.cur_section.as_str()) {
-                SectionAction::Pass => {
+                None => {
                     let mut unseen_entries: Vec<_> = source
                         .section_entries(self.cur_section.clone())
                         .filter(|e| !self.seen_keys.contains(e.0.as_ref()))
@@ -63,11 +63,11 @@ impl MergeState {
                     for (key, value) in unseen_entries {
                         let action = mutations.find_action(self.cur_section.as_str(), key);
                         self.seen_keys.insert(key.to_string());
-                        self.emit_kv(action.as_ref(), key, Some(value), None);
+                        self.emit_kv(action.as_deref(), key, Some(value), None);
                     }
                 }
-                SectionAction::Ignore => (),
-                SectionAction::Delete => (),
+                Some(SectionAction::Ignore) => (),
+                Some(SectionAction::Delete) => (),
             }
         }
         self.emit_force_keys(mutations);
@@ -86,7 +86,7 @@ impl MergeState {
             forced_keys.sort();
             for key in forced_keys {
                 let action = mutations.find_action(self.cur_section.as_str(), key);
-                self.emit_kv(action.as_ref(), key, None, None);
+                self.emit_kv(action.as_deref(), key, None, None);
             }
         }
     }
@@ -94,13 +94,13 @@ impl MergeState {
     /// Emit a key-value line, handling transforms. Ignores are NOT handled here fully.
     fn emit_kv(
         &mut self,
-        action: &Action,
+        action: Option<&Action>,
         key: &str,
         source: Option<&SourceValue>,
         target: Option<ini_roundtrip::Item>,
     ) {
         match action {
-            Action::Pass => {
+            None => {
                 match source {
                     Some(val) => self.result.push(val.raw().into()),
                     // PANIC safety: In all cases were we are called with action pass, we should
@@ -109,9 +109,9 @@ impl MergeState {
                     None => panic!("This should never happen"),
                 }
             }
-            Action::Ignore => (),
-            Action::Delete => (),
-            Action::Transform(transform) => {
+            Some(Action::Ignore) => (),
+            Some(Action::Delete) => (),
+            Some(Action::Transform(transform)) => {
                 let src =
                     source.map(|v| crate::Property::from_src(self.cur_section.as_str(), key, v));
                 let tgt = target
@@ -157,14 +157,14 @@ pub(crate) fn merge<'a>(
                 state.pending_lines.clear();
 
                 match mutations.find_section_action(name) {
-                    SectionAction::Ignore => state.push_raw(raw.into()),
-                    SectionAction::Pass if source.has_section(name) => state.push_raw(raw.into()),
+                    Some(SectionAction::Ignore) => state.push_raw(raw.into()),
+                    None if source.has_section(name) => state.push_raw(raw.into()),
                     // We cannot yet be sure that this section shouldn't exist.
                     // It is possible that a key in this section is ignored, even
                     // though the whole section is not.
-                    SectionAction::Pass => state.pending_lines.push(raw.into()),
+                    None => state.pending_lines.push(raw.into()),
                     // We will definitely skip the section in this case.
-                    SectionAction::Delete => (),
+                    Some(SectionAction::Delete) => (),
                 }
             }
             ini_roundtrip::Item::SectionEnd => (),
@@ -175,26 +175,26 @@ pub(crate) fn merge<'a>(
                     Cow::Owned(state.cur_section.clone()),
                     Cow::Borrowed(key),
                 ));
-                match action.as_ref() {
-                    Action::Pass => {
+                match action.as_deref() {
+                    None => {
                         if let Some(src_val) = src_property {
                             state.seen_keys.insert(key.into());
                             state.emit_pending_lines();
-                            state.emit_kv(action.as_ref(), key, Some(src_val), Some(target));
+                            state.emit_kv(action.as_deref(), key, Some(src_val), Some(target));
                         }
                     }
-                    Action::Ignore => {
+                    Some(Action::Ignore) => {
                         state.seen_keys.insert(key.into());
                         state.emit_pending_lines();
                         state.result.push(raw.into());
                     }
-                    Action::Delete => {
+                    Some(Action::Delete) => {
                         // Nothing to do, just don't emit anything
                     }
-                    Action::Transform(_) => {
+                    Some(Action::Transform(_)) => {
                         state.seen_keys.insert(key.into());
                         state.emit_pending_lines();
-                        state.emit_kv(action.as_ref(), key, src_property, Some(target));
+                        state.emit_kv(action.as_deref(), key, src_property, Some(target));
                     }
                 }
             }
@@ -225,9 +225,9 @@ pub(crate) fn merge<'a>(
             continue;
         }
         match mutations.find_section_action(section) {
-            SectionAction::Pass => (),
-            SectionAction::Ignore => continue,
-            SectionAction::Delete => continue,
+            None => (),
+            Some(SectionAction::Ignore) => continue,
+            Some(SectionAction::Delete) => continue,
         }
         state.cur_section.clear();
         state.cur_section.push_str(section);
@@ -239,7 +239,7 @@ pub(crate) fn merge<'a>(
         for (key, value) in source.section_entries(section.clone()) {
             let action = mutations.find_action(section, key);
             state.seen_keys.insert(key.to_string());
-            state.emit_kv(action.as_ref(), key, Some(value), None);
+            state.emit_kv(action.as_deref(), key, Some(value), None);
         }
         state.emit_force_keys(mutations)
     }

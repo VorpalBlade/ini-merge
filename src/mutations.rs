@@ -18,8 +18,6 @@ pub mod transforms;
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum Action {
-    /// Normal merge logic. This is implied for entries not in the mutations set.
-    Pass,
     /// Ignore source value, always use target value
     Ignore,
     /// Remove this entry
@@ -37,7 +35,6 @@ impl From<SectionAction> for Action {
 impl From<&SectionAction> for Action {
     fn from(value: &SectionAction) -> Self {
         match value {
-            SectionAction::Pass => Action::Pass,
             SectionAction::Ignore => Action::Ignore,
             SectionAction::Delete => Action::Delete,
         }
@@ -48,8 +45,6 @@ impl From<&SectionAction> for Action {
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum SectionAction {
-    /// Normal merge logic. This is implied for entries not in the mutations set.
-    Pass,
     /// Ignore source value, always use target value
     Ignore,
     /// Remove this whole section
@@ -72,17 +67,17 @@ impl Mutations {
     }
 
     #[inline]
-    pub(crate) fn find_section_action(&self, section: &str) -> &SectionAction {
-        self.actions
-            .find_section_action(section)
-            .unwrap_or(&SectionAction::Pass)
+    pub(crate) fn find_section_action(&self, section: &str) -> Option<&SectionAction> {
+        self.actions.find_section_action(section)
     }
 
     #[inline]
-    pub(crate) fn find_action<'this>(&'this self, section: &str, key: &str) -> Cow<'this, Action> {
-        self.actions
-            .find_action(section, key)
-            .unwrap_or(Cow::Borrowed(&Action::Pass))
+    pub(crate) fn find_action<'this>(
+        &'this self,
+        section: &str,
+        key: &str,
+    ) -> Option<Cow<'this, Action>> {
+        self.actions.find_action(section, key)
     }
 }
 
