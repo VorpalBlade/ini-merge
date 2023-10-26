@@ -1,15 +1,21 @@
 //! Define mutations that can be applied.
 
-use crate::mutations::transforms::TransformSet;
+use crate::{
+    actions::{Actions, ActionsBuilder},
+    mutations::transforms::TransformSet,
+};
 
 use self::transforms::Transformer;
-use regex::RegexSet;
-use std::collections::{HashMap, HashSet};
+use std::{
+    borrow::Cow,
+    collections::{HashMap, HashSet},
+    rc::Rc,
+};
 
 pub mod transforms;
 
 /// Describes the action for mutating the input
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum Action {
     /// Normal merge logic. This is implied for entries not in the mutations set.
@@ -19,11 +25,27 @@ pub enum Action {
     /// Remove this entry
     Delete,
     /// Custom transform
-    Transform(Box<dyn Transformer>),
+    Transform(Rc<dyn Transformer>),
+}
+
+impl From<SectionAction> for Action {
+    fn from(value: SectionAction) -> Self {
+        Self::from(&value)
+    }
+}
+
+impl From<&SectionAction> for Action {
+    fn from(value: &SectionAction) -> Self {
+        match value {
+            SectionAction::Pass => Action::Pass,
+            SectionAction::Ignore => Action::Ignore,
+            SectionAction::Delete => Action::Delete,
+        }
+    }
 }
 
 /// Describes actions to apply to whole sections
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum SectionAction {
     /// Normal merge logic. This is implied for entries not in the mutations set.
@@ -37,15 +59,8 @@ pub enum SectionAction {
 /// Collects all the ways we can ignore, transform etc (mutations)
 #[derive(Debug)]
 pub struct Mutations {
-    /// Actions for whole sections.
-    section_actions: HashMap<String, SectionAction>,
-    /// Literal matches and associated actions on (section, key)
-    literal_actions: HashMap<String, Action>,
-    /// Regex matches on (section, key)
-    /// We use the null byte as a separator between the key and value here.
-    regex_matches: RegexSet,
-    /// Associated actions for regex matches
-    regex_actions: Vec<Action>,
+    /// Inner actions
+    actions: Actions<Action, SectionAction>,
     /// Section & keys that must exist (used to make "set" work)
     pub(crate) forced_keys: HashMap<String, HashSet<String>>,
 }
@@ -56,39 +71,26 @@ impl Mutations {
         MutationsBuilder::new()
     }
 
+    #[inline]
     pub(crate) fn find_section_action(&self, section: &str) -> &SectionAction {
-        self.section_actions
-            .get(section)
+        self.actions
+            .find_section_action(section)
             .unwrap_or(&SectionAction::Pass)
     }
 
-    pub(crate) fn find_action(&self, section: &str, key: &str) -> &Action {
-        // Section actions have priority.
-        match self.find_section_action(section) {
-            SectionAction::Pass => (),
-            SectionAction::Ignore => return &Action::Ignore,
-            SectionAction::Delete => return &Action::Delete,
-        }
-        let sec_key = section.to_string() + "\0" + key;
-        if let Some(act) = self.literal_actions.get(sec_key.as_str()) {
-            return act;
-        }
-        let re_matches = self.regex_matches.matches(sec_key.as_str());
-        if re_matches.matched_any() {
-            let m = re_matches.iter().next().unwrap();
-            return self.regex_actions.get(m).unwrap();
-        }
-        &Action::Pass
+    #[inline]
+    pub(crate) fn find_action<'this>(&'this self, section: &str, key: &str) -> Cow<'this, Action> {
+        self.actions
+            .find_action(section, key)
+            .unwrap_or(Cow::Borrowed(&Action::Pass))
     }
 }
 
 /// Builder for [Mutations].
 #[derive(Debug, Default)]
 pub struct MutationsBuilder {
-    section_actions: HashMap<String, SectionAction>,
-    literal_actions: HashMap<String, Action>,
-    regex_matches: Vec<String>,
-    regex_actions: Vec<Action>,
+    /// Inner builder
+    action_builder: ActionsBuilder<Action, SectionAction>,
     /// Note! Only add entries that also exist as a transform here
     forced_keys: HashMap<String, HashSet<String>>,
 }
@@ -101,64 +103,49 @@ impl MutationsBuilder {
     }
 
     /// Add an ignore for a given section (exact match)
-    #[must_use]
-    pub fn add_section_action(self, section: impl Into<String>, action: SectionAction) -> Self {
-        fn inner(
-            mut this: MutationsBuilder,
-            section: String,
-            action: SectionAction,
-        ) -> MutationsBuilder {
-            this.section_actions.insert(section, action);
-            this
-        }
-        inner(self, section.into(), action)
+    pub fn add_section_action(&mut self, section: impl Into<String>, action: SectionAction) {
+        self.action_builder.add_section_action(section, action)
     }
 
     /// Add an action for an exact match of section and key
-    #[must_use]
     pub fn add_literal_action(
-        mut self,
+        &mut self,
         section: impl Into<String>,
         key: impl AsRef<str>,
         action: Action,
-    ) -> Self {
-        self.literal_actions
-            .insert(section.into() + "\0" + key.as_ref(), action);
-        self
+    ) {
+        self.action_builder.add_literal_action(section, key, action)
     }
 
     /// Add an action for a regex match of a section and key
-    #[must_use]
     pub fn add_regex_action(
-        mut self,
+        &mut self,
         section: impl Into<String>,
         key: impl AsRef<str>,
         action: Action,
-    ) -> Self {
-        self.regex_actions.push(action);
-        self.regex_matches
-            .push(section.into() + "\0" + key.as_ref());
-        self
+    ) {
+        self.action_builder.add_regex_action(section, key, action)
     }
 
     /// Add a forced set.
     pub fn add_setter(
-        self,
+        &mut self,
         section: impl Into<String>,
         key: impl Into<String>,
         value: impl AsRef<str>,
         separator: impl AsRef<str>,
-    ) -> Self {
+    ) {
         fn inner(
-            mut this: MutationsBuilder,
+            this: &mut MutationsBuilder,
             section: String,
             key: String,
             value: &str,
             separator: &str,
-        ) -> MutationsBuilder {
-            this.literal_actions.insert(
-                section.clone() + "\0" + key.as_ref(),
-                Action::Transform(Box::new(TransformSet::new(key.clone() + separator + value))),
+        ) {
+            this.action_builder.add_literal_action(
+                &section,
+                &key,
+                Action::Transform(Rc::new(TransformSet::new(key.clone() + separator + value))),
             );
             this.forced_keys
                 .entry(section)
@@ -166,7 +153,6 @@ impl MutationsBuilder {
                     v.insert(key.clone());
                 })
                 .or_insert_with(|| HashSet::from_iter([key]));
-            this
         }
         inner(
             self,
@@ -182,10 +168,7 @@ impl MutationsBuilder {
     /// Errors if a regex fails to compile.
     pub fn build(self) -> Result<Mutations, regex::Error> {
         Ok(Mutations {
-            section_actions: self.section_actions,
-            literal_actions: self.literal_actions,
-            regex_matches: RegexSet::new(self.regex_matches)?,
-            regex_actions: self.regex_actions,
+            actions: self.action_builder.build()?,
             forced_keys: self.forced_keys,
         })
     }

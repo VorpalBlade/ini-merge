@@ -5,7 +5,7 @@ use crate::mutations::{
 
 use indoc::indoc;
 use pretty_assertions::assert_eq;
-use std::collections::VecDeque;
+use std::{collections::VecDeque, rc::Rc};
 
 const SOURCE: &str = indoc! {"
     ; Comments are ignored in source
@@ -83,23 +83,22 @@ fn test_merge_ini() {
     let mut tgt: VecDeque<_> = TARGET.as_bytes().to_owned().into();
 
     // Test a bunch of different actions and matchers.
-    let mutations = MutationsBuilder::new()
-        .add_section_action("s3", SectionAction::Ignore)
-        .add_literal_action("s1", "c", Action::Ignore)
-        .add_literal_action("s2", "e", Action::Ignore)
-        .add_literal_action(
-            "s1",
-            "playmedia",
-            Action::Transform(Box::new(TransformKdeShortcut)),
-        )
-        .add_regex_action("s5", ".*_ign", Action::Ignore)
-        .add_regex_action(
-            "s1",
-            "unsorted_.*",
-            Action::Transform(Box::new(TransformUnsortedLists::new(','))),
-        )
-        .build()
-        .unwrap();
+    let mut mutations = MutationsBuilder::new();
+    mutations.add_section_action("s3", SectionAction::Ignore);
+    mutations.add_literal_action("s1", "c", Action::Ignore);
+    mutations.add_literal_action("s2", "e", Action::Ignore);
+    mutations.add_literal_action(
+        "s1",
+        "playmedia",
+        Action::Transform(Rc::new(TransformKdeShortcut)),
+    );
+    mutations.add_regex_action("s5", ".*_ign", Action::Ignore);
+    mutations.add_regex_action(
+        "s1",
+        "unsorted_.*",
+        Action::Transform(Rc::new(TransformUnsortedLists::new(','))),
+    );
+    let mutations = mutations.build().unwrap();
 
     let result = super::merge_ini(&mut tgt, &mut src, &mutations).unwrap();
 

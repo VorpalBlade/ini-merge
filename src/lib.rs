@@ -12,6 +12,7 @@ use std::io::Read;
 
 use thiserror::Error;
 
+pub mod actions;
 mod loader;
 mod merge;
 pub mod mutations;
