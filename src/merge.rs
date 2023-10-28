@@ -1,12 +1,39 @@
 //! Merger function
 
+pub mod mutations;
+
+#[cfg(test)]
+mod tests;
+
+use self::mutations::{Action, Mutations, SectionAction};
 use crate::{
-    loader::Loader,
-    mutations::{Action, Mutations, SectionAction},
-    source_loader::{SectionAndKey, SourceIni, SourceValue},
+    loader::{self, Loader},
+    source_loader::{self, SectionAndKey, SourceIni, SourceValue},
 };
 use lending_iterator::prelude::*;
-use std::{borrow::Cow, collections::HashSet};
+use thiserror::Error;
+use std::{borrow::Cow, collections::HashSet, io::Read};
+
+/// Error type for INI merger
+#[derive(Debug, Error)]
+#[non_exhaustive]
+pub enum MergeError {
+    /// An error while loading the target INI
+    #[error("Failed to load target INI due to {0}")]
+    TargetLoad(#[source] Box<dyn std::error::Error + 'static + Send + Sync>),
+    /// An error while loading the source INI
+    #[error("Failed to load source INI due to {0}")]
+    SourceLoad(#[source] Box<dyn std::error::Error + 'static + Send + Sync>),
+    /// A transformer reported an error
+    #[error("Failed to apply transform {transformer} on {section}->{key} due to {reason}")]
+    TransformerError {
+        /// Transformer being applied
+        transformer: String,
+        section: String,
+        key: String,
+        reason: String,
+    },
+}
 
 /// State tracking for the merge algorithm
 #[derive(Debug)]
@@ -253,4 +280,17 @@ pub(crate) fn merge<'a>(
     }
 
     state.result
+}
+
+/// Merge two INI files, giving the merged file as a vector of strings, one per line.
+pub fn merge_ini(
+    target: &mut impl Read,
+    source: &mut impl Read,
+    mutations: &mutations::Mutations,
+) -> Result<Vec<String>, MergeError> {
+    let mut target =
+        loader::load_ini(target).map_err(|inner| MergeError::TargetLoad(inner.into()))?;
+    let source = source_loader::load_source_ini(source)
+        .map_err(|inner| MergeError::SourceLoad(inner.into()))?;
+    Ok(merge(&mut target, &source, mutations))
 }

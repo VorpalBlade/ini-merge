@@ -5,10 +5,12 @@
 This library forms the backend to [chezmoi_modify_manager]. You probably
 want that tool instead.
 
-This library provides merging of a source INI file with a target INI file.
-The merging is asymmetric: The values of the source are preferred unless
-specific rules have been provided for those sections and/or keys. Formatting
-is preserved.
+This library provides processing of INI files. In particular:
+
+* Merging of a source INI file with a target INI file.
+  The merging is asymmetric: The values of the source are preferred unless
+  specific rules have been provided for those sections and/or keys.
+  Formatting is preserved. See [merge_ini].
 
 The use case of this is configuration management for user settings file where
 the program writes a mix of settings and state to the same file. This gets

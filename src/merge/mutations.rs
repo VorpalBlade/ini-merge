@@ -1,4 +1,4 @@
-//! Define mutations that can be applied.
+//! Define mutations that can be applied to merging
 
 use crate::{
     actions::{Actions, ActionsBuilder, ActionsBuilderError},
