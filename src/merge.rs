@@ -1,4 +1,4 @@
-//! Merger function
+//! INI merger functionality
 
 pub mod mutations;
 

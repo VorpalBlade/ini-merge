@@ -155,8 +155,12 @@ impl Transformer for TransformKdeShortcut {
 ///
 /// This is meant to be used together with templating, to override an entry
 /// only on some systems.
+/// 
+/// *NOTE*: This is not meant to be used directly, as special support is
+/// needed elsewhere. Instead use [super::MutationsBuilder::add_setter]
 ///
-/// No arguments
+/// Arguments:
+/// * `raw`: Raw line to set
 #[derive(Debug)]
 pub struct TransformSet {
     raw: String,
