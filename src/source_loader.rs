@@ -1,7 +1,11 @@
+//! This module handles loading the source INI into a form that is easy for
+//! random access (instead of the linear processing we do with the target state
+//! INI file).
 use lending_iterator::prelude::*;
 use std::{borrow::Cow, collections::HashMap, io::Read};
 use thiserror::Error;
 
+/// Newtype for INI section and key
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct SectionAndKey<'a>(Cow<'a, str>, Cow<'a, str>);
 
@@ -11,9 +15,12 @@ impl<'a> SectionAndKey<'a> {
     }
 }
 
+/// An entry from the source INI file
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct SourceValue {
+    /// The full raw line
     raw_line: String,
+    /// The value from that line
     val: Option<String>,
 }
 
@@ -43,9 +50,13 @@ impl SourceValue {
     }
 }
 
+/// Contains all the relevant information from the source INI file in a
+/// random access friendly manner
 #[derive(Debug, Default)]
 pub(crate) struct SourceIni {
+    /// A mapping from section header name to the raw line
     section_headers: HashMap<String, String>,
+    /// A mapping for all the keys to their parsed value and raw lines
     values: HashMap<SectionAndKey<'static>, SourceValue>,
 }
 
@@ -79,6 +90,7 @@ impl SourceIni {
     }
 }
 
+/// Parses an INI file into a [SourceIni]
 pub(crate) fn load_source_ini(data: &mut impl Read) -> Result<SourceIni, SourceLoaderError> {
     let mut loader = crate::loader::load_ini(data).map_err(SourceLoaderError::Load)?;
     let mut result = SourceIni::default();

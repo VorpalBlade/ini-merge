@@ -3,6 +3,10 @@ use lending_iterator::prelude::*;
 use ouroboros::self_referencing;
 use std::io::Read;
 
+/// A loader for INI files. Handles the parser state internally.
+///
+/// Acts as a *lending* iterator over it's contents to avoid copies when
+/// parsing.
 #[self_referencing]
 pub(crate) struct Loader {
     data: String,

@@ -42,7 +42,7 @@ impl From<&SectionAction> for Action {
 }
 
 /// Describes actions to apply to whole sections
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
 pub enum SectionAction {
     /// Ignore source value, always use target value

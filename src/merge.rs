@@ -8,12 +8,20 @@ use crate::{
 use lending_iterator::prelude::*;
 use std::{borrow::Cow, collections::HashSet};
 
+/// State tracking for the merge algorithm
 #[derive(Debug)]
 struct MergeState {
+    /// Buffer building up the merged result
     result: Vec<String>,
+    /// Temporary buffer that may be discarded or appended to [result] depending
+    /// on what follows
     pending_lines: Vec<String>,
+    /// All the section names we have seen so far
     seen_sections: HashSet<String>,
+    /// All the keys we have seen so far in the current section (cleared for
+    /// each new section)
     seen_keys: HashSet<String>,
+    /// Name of the current section
     cur_section: String,
 }
 
