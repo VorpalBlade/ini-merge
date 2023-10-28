@@ -11,8 +11,8 @@ use crate::{
     source_loader::{self, SectionAndKey, SourceIni, SourceValue},
 };
 use lending_iterator::prelude::*;
-use thiserror::Error;
 use std::{borrow::Cow, collections::HashSet, io::Read};
+use thiserror::Error;
 
 /// Error type for INI merger
 #[derive(Debug, Error)]

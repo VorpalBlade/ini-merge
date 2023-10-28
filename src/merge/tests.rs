@@ -43,7 +43,7 @@ const TARGET: &str = indoc! {"
     b = overwritten
     d
     e
-    
+
     [s3]
     ignored, and kept = 3
 

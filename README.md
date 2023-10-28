@@ -11,6 +11,7 @@ This library provides processing of INI files. In particular:
   The merging is asymmetric: The values of the source are preferred unless
   specific rules have been provided for those sections and/or keys.
   Formatting is preserved. See [merge_ini].
+* Filtering of an INI file based on a rule set
 
 The use case of this is configuration management for user settings file where
 the program writes a mix of settings and state to the same file. This gets
