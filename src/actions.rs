@@ -3,8 +3,10 @@
 use std::{borrow::Cow, collections::HashMap};
 
 use regex::RegexSet;
+use thiserror::Error;
 
-/// Collects all the ways we can ignore, transform etc (mutations)
+/// Handles matching on INI lines and mapping the matches to generic actions
+/// to be performed
 #[derive(Debug)]
 pub struct Actions<Action, SectionAction>
 where
@@ -34,10 +36,13 @@ where
         ActionsBuilder::<Action, SectionAction>::new()
     }
 
+    /// Lookup if there is a section action for the whole section
     pub(crate) fn find_section_action(&self, section: &str) -> Option<&SectionAction> {
         self.section_actions.get(section)
     }
 
+    /// Lookup if there is an action (or section action) for a specific section
+    /// and key
     pub(crate) fn find_action<'this>(
         &'this self,
         section: &str,
@@ -60,7 +65,7 @@ where
     }
 }
 
-/// Builder for [Mutations].
+/// Builder for [Actions].
 #[derive(Debug)]
 pub struct ActionsBuilder<Action, SectionAction>
 where
@@ -129,15 +134,25 @@ where
             .push(section.into() + "\0" + key.as_ref());
     }
 
-    /// Build the Mutations struct
+    /// Build the [Actions] struct
     ///
     /// Errors if a regex fails to compile.
-    pub fn build(self) -> Result<Actions<Action, SectionAction>, regex::Error> {
+    pub fn build(self) -> Result<Actions<Action, SectionAction>, ActionsBuilderError> {
         Ok(Actions {
             section_actions: self.section_actions,
             literal_actions: self.literal_actions,
-            regex_matches: RegexSet::new(self.regex_matches)?,
+            regex_matches: RegexSet::new(self.regex_matches)
+                .map_err(|e| ActionsBuilderError::RegexCompile(Box::new(e)))?,
             regex_actions: self.regex_actions,
         })
     }
+}
+
+/// Error type for [ActionsBuilder]
+#[derive(Debug, Error)]
+#[non_exhaustive]
+pub enum ActionsBuilderError {
+    /// A regular expression failed to compile
+    #[error("Failed to compile a regular expression: {0}")]
+    RegexCompile(#[source] Box<dyn std::error::Error + 'static + Send + Sync>),
 }

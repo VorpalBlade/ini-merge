@@ -1,7 +1,7 @@
 //! Define mutations that can be applied.
 
 use crate::{
-    actions::{Actions, ActionsBuilder},
+    actions::{Actions, ActionsBuilder, ActionsBuilderError},
     mutations::transforms::TransformSet,
 };
 
@@ -161,7 +161,7 @@ impl MutationsBuilder {
     /// Build the Mutations struct
     ///
     /// Errors if a regex fails to compile.
-    pub fn build(self) -> Result<Mutations, regex::Error> {
+    pub fn build(self) -> Result<Mutations, ActionsBuilderError> {
         Ok(Mutations {
             actions: self.action_builder.build()?,
             forced_keys: self.forced_keys,
