@@ -125,13 +125,24 @@ where
     /// Add an action for a regex match of a section and key
     pub fn add_regex_action(
         &mut self,
-        section: impl Into<String>,
+        section: impl AsRef<str>,
         key: impl AsRef<str>,
         action: Action,
     ) {
-        self.regex_actions.push(action);
-        self.regex_matches
-            .push(section.into() + "\0" + key.as_ref());
+        fn inner<Action, SectionAction>(
+            this: &mut ActionsBuilder<Action, SectionAction>,
+            section: &str,
+            key: &str,
+            action: Action,
+        ) where
+            Action: From<SectionAction> + Clone,
+            for<'a> Action: From<&'a SectionAction>,
+            SectionAction: Clone,
+        {
+            this.regex_actions.push(action);
+            this.regex_matches.push(format!("(?:{section})\0(?:{key})"));
+        }
+        inner(self, section.as_ref(), key.as_ref(), action)
     }
 
     /// Build the [Actions] struct

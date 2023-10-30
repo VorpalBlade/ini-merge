@@ -115,7 +115,7 @@ impl MutationsBuilder {
     /// Add an action for a regex match of a section and key
     pub fn add_regex_action(
         &mut self,
-        section: impl Into<String>,
+        section: impl AsRef<str>,
         key: impl AsRef<str>,
         action: Action,
     ) {
