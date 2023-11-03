@@ -98,8 +98,13 @@ impl MutationsBuilder {
     }
 
     /// Add an ignore for a given section (exact match)
-    pub fn add_section_action(&mut self, section: impl Into<String>, action: SectionAction) {
-        self.action_builder.add_section_action(section, action)
+    pub fn add_section_action(
+        &mut self,
+        section: impl Into<String>,
+        action: SectionAction,
+    ) -> &mut Self {
+        self.action_builder.add_section_action(section, action);
+        self
     }
 
     /// Add an action for an exact match of section and key
@@ -108,8 +113,9 @@ impl MutationsBuilder {
         section: impl Into<String>,
         key: impl AsRef<str>,
         action: Action,
-    ) {
-        self.action_builder.add_literal_action(section, key, action)
+    ) -> &mut Self {
+        self.action_builder.add_literal_action(section, key, action);
+        self
     }
 
     /// Add an action for a regex match of a section and key
@@ -118,8 +124,9 @@ impl MutationsBuilder {
         section: impl AsRef<str>,
         key: impl AsRef<str>,
         action: Action,
-    ) {
-        self.action_builder.add_regex_action(section, key, action)
+    ) -> &mut Self {
+        self.action_builder.add_regex_action(section, key, action);
+        self
     }
 
     /// Add a forced set.
@@ -129,7 +136,7 @@ impl MutationsBuilder {
         key: impl Into<String>,
         value: impl AsRef<str>,
         separator: impl AsRef<str>,
-    ) {
+    ) -> &mut Self {
         fn inner(
             this: &mut MutationsBuilder,
             section: String,
@@ -155,7 +162,8 @@ impl MutationsBuilder {
             key.into(),
             value.as_ref(),
             separator.as_ref(),
-        )
+        );
+        self
     }
 
     /// Build the Mutations struct

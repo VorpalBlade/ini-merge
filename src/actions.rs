@@ -107,8 +107,13 @@ where
     }
 
     /// Add an ignore for a given section (exact match)
-    pub fn add_section_action(&mut self, section: impl Into<String>, action: SectionAction) {
+    pub fn add_section_action(
+        &mut self,
+        section: impl Into<String>,
+        action: SectionAction,
+    ) -> &mut Self {
         self.section_actions.insert(section.into(), action);
+        self
     }
 
     /// Add an action for an exact match of section and key
@@ -117,9 +122,10 @@ where
         section: impl Into<String>,
         key: impl AsRef<str>,
         action: Action,
-    ) {
+    ) -> &mut Self {
         self.literal_actions
             .insert(section.into() + "\0" + key.as_ref(), action);
+        self
     }
 
     /// Add an action for a regex match of a section and key
@@ -128,7 +134,7 @@ where
         section: impl AsRef<str>,
         key: impl AsRef<str>,
         action: Action,
-    ) {
+    ) -> &mut Self {
         fn inner<Action, SectionAction>(
             this: &mut ActionsBuilder<Action, SectionAction>,
             section: &str,
@@ -142,7 +148,8 @@ where
             this.regex_actions.push(action);
             this.regex_matches.push(format!("(?:{section})\0(?:{key})"));
         }
-        inner(self, section.as_ref(), key.as_ref(), action)
+        inner(self, section.as_ref(), key.as_ref(), action);
+        self
     }
 
     /// Build the [Actions] struct
