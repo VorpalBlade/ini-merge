@@ -11,6 +11,7 @@ use crate::{
     source_loader::{self, SectionAndKey, SourceIni, SourceValue},
 };
 use lending_iterator::prelude::*;
+use log::warn;
 use std::{borrow::Cow, collections::HashSet, io::Read};
 use thiserror::Error;
 
@@ -174,7 +175,7 @@ pub(crate) fn merge<'a>(
     while let Some(ref entry) = target.next() {
         match *entry {
             ini_roundtrip::Item::Error(raw) => {
-                // TODO: Log warning
+                warn!(target: "ini-merge", "Failed to parse line, copying verbatim: {raw}");
                 state.push_raw(raw.into());
             }
             ini_roundtrip::Item::Comment { raw } | ini_roundtrip::Item::Blank { raw } => {

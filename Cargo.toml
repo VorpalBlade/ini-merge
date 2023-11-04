@@ -7,13 +7,14 @@ keywords = ["ini", "config", "configuration", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
-version = "0.3.1"
+version = "0.3.2"
 
 [dependencies]
 ini-roundtrip = "0.1.2"
 itertools = { version = "0.11.0", default-features = false }
 keyring = { version = "2.0.5", optional = true }
 lending-iterator = { version = "0.1.7", default-features = false }
+log = { version = "0.4.20" }
 ouroboros = { version = "0.18.0", default-features = false }
 regex = "1.10.2"
 thiserror = "1.0.50"

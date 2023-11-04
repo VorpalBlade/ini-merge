@@ -2,6 +2,7 @@
 
 use std::{borrow::Cow, collections::HashMap};
 
+use log::warn;
 use regex::RegexSet;
 use thiserror::Error;
 
@@ -58,8 +59,12 @@ where
         }
         let re_matches = self.regex_matches.matches(sec_key.as_str());
         if re_matches.matched_any() {
-            let m = re_matches.iter().next().unwrap();
-            return Some(Cow::Borrowed(self.regex_actions.get(m).unwrap()));
+            let matches: Vec<_> = re_matches.iter().collect();
+            if matches.len() != 1 {
+                warn!(target: "ini-merge", "Warning: Overlapping regex matches for {section}/{key}, first action taken");
+            }
+            let m = matches.first().unwrap();
+            return Some(Cow::Borrowed(self.regex_actions.get(*m).unwrap()));
         }
         None
     }
