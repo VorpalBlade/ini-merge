@@ -1,7 +1,7 @@
 //! INI filtering functionality
 
 use lending_iterator::prelude::*;
-use log::warn;
+use log::error;
 use std::io::Read;
 use thiserror::Error;
 
@@ -96,7 +96,7 @@ pub(crate) fn filter(input: &mut Loader, actions: &FilterActions) -> Vec<String>
     while let Some(ref entry) = input.next() {
         match *entry {
             ini_roundtrip::Item::Error(raw) => {
-                warn!(target: "ini-merge", "Failed to parse line, copying verbatim: {raw}");
+                error!(target: "ini-merge", "Failed to parse line, copying verbatim: {raw}");
                 state.push_pending(raw.into());
             }
             ini_roundtrip::Item::Comment { raw } | ini_roundtrip::Item::Blank { raw } => {
