@@ -85,4 +85,4 @@ jobs:
         with:
           save-if: ${{ matrix.features == '--no-default-features --features=keyring' }}
       - name: Compile and test
-        run: cargo test --locked ${{ matrix.features }} --verbose
+        run: cargo test ${{ matrix.features }} --verbose
