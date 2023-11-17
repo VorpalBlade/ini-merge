@@ -24,6 +24,11 @@ boxes. Other programs (such as PrusaSlicer) also do the same thing.
 This library can be used as a backend to implement a tool to smartly merge
 such INI files. Such a tool is already available: [chezmoi_modify_manager].
 
+## MSRV
+
+Current minimum supported Rust version is 1.70.0. This may be updated as
+needed. MSRV bump is not considered a semver breaking change.
+
 [chezmoi_modify_manager]: https://github.com/VorpalBlade/chezmoi_modify_manager
 [chezmoi]: https://www.chezmoi.io/
 [crates.io]: https://crates.io/crates/ini-merge

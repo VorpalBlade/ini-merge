@@ -62,3 +62,27 @@ jobs:
         uses: Swatinem/rust-cache@v2.7.1
       - name: Compile and test
         run: cargo test --target ${{ matrix.target }} --verbose
+
+  configurations:
+    # Test non-standard configurations, MSRV and Rust versions
+    name: "Test: \"${{ matrix.features }}\" (Linux), Rust ${{ matrix.rust }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        features:
+          - --no-default-features
+          - --no-default-features --features=keyring
+        rust:
+          - 1.70.0
+          - stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
+      - name: Cache builds
+        uses: Swatinem/rust-cache@v2.7.1
+        with:
+          save-if: ${{ matrix.features == '--no-default-features --features=keyring' }}
+      - name: Compile and test
+        run: cargo test --locked ${{ matrix.features }} --verbose
