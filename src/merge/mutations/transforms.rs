@@ -197,6 +197,8 @@ mod keyring_transform {
     use std::borrow::Borrow;
     use std::hash::Hash;
 
+    use log::error;
+
     use crate::InputData;
 
     use super::{Transformer, TransformerAction, TransformerError};
@@ -237,13 +239,13 @@ mod keyring_transform {
                     Ok(entry) => match entry.get_password() {
                         Ok(v) => Some(v),
                         Err(err) => {
-                            eprintln!("Keyring lookup error: {err}");
-                            eprintln!("Keyring query: service={} user={}", self.service, self.user);
+                            error!("Keyring lookup error: {err}");
+                            error!("Keyring query: service={} user={}", self.service, self.user);
                             None
                         }
                     },
                     Err(err) => {
-                        eprintln!("Keyring error: {err}");
+                        error!("Keyring error: {err}");
                         None
                     }
                 }
