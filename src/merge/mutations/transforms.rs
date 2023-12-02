@@ -90,7 +90,7 @@ impl Transformer for TransformUnsortedLists {
     {
         Ok(Self::new(
             args.get("separator")
-                .map(|x| x.as_ref())
+                .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get separator"))?
                 .chars()
                 .exactly_one()
@@ -185,7 +185,7 @@ impl Transformer for TransformSet {
     {
         Ok(Self::new(
             args.get("raw")
-                .map(|x| x.as_ref())
+                .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get raw entry"))?
                 .to_owned(),
         ))
@@ -281,11 +281,11 @@ mod keyring_transform {
         {
             let service = args
                 .get("service")
-                .map(|x| x.as_ref())
+                .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get service"))?;
             let user = args
                 .get("user")
-                .map(|x| x.as_ref())
+                .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get user"))?;
             Ok(Self::new(service.to_string(), user.to_string()))
         }

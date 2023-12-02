@@ -129,7 +129,7 @@ pub(crate) fn filter(input: &mut Loader, actions: &FilterActions) -> Vec<String>
                             Some(value) => {
                                 let separator =
                                     raw.get(key.len()..(raw.len() - value.len())).unwrap_or("=");
-                                state.push(format!("{key}{separator}{replacement}"))
+                                state.push(format!("{key}{separator}{replacement}"));
                             }
                             // There is no value, nothing to hide...
                             None => state.push(raw.into()),
