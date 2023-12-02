@@ -277,7 +277,7 @@ pub(crate) fn merge<'a>(
             state.seen_keys.insert(key.to_string());
             state.emit_kv(action.as_deref(), key, Some(value), None);
         }
-        state.emit_force_keys(mutations)
+        state.emit_force_keys(mutations);
     }
 
     state.result

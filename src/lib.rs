@@ -12,6 +12,9 @@
 //!   Formatting is preserved. See [merge::merge_ini].
 //! * Filtering of an INI file based on a rule set
 
+#![warn(clippy::wildcard_imports)]
+#![warn(clippy::needless_pass_by_value)]
+
 pub mod actions;
 pub mod filter;
 mod loader;
