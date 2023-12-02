@@ -171,7 +171,7 @@ where
     }
 }
 
-/// Error type for [ActionsBuilder]
+/// Error type for [`ActionsBuilder`]
 #[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum ActionsBuilderError {

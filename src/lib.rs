@@ -9,11 +9,12 @@
 //! * Merging of a source INI file with a target INI file.
 //!   The merging is asymmetric: The values of the source are preferred unless
 //!   specific rules have been provided for those sections and/or keys.
-//!   Formatting is preserved. See [merge::merge_ini].
+//!   Formatting is preserved. See [`merge::merge_ini`].
 //! * Filtering of an INI file based on a rule set
 
-#![warn(clippy::wildcard_imports)]
+#![warn(clippy::doc_markdown)]
 #![warn(clippy::needless_pass_by_value)]
+#![warn(clippy::wildcard_imports)]
 
 pub mod actions;
 pub mod filter;

@@ -90,7 +90,7 @@ impl SourceIni {
     }
 }
 
-/// Parses an INI file into a [SourceIni]
+/// Parses an INI file into a [`SourceIni`]
 pub(crate) fn load_source_ini(data: &mut impl Read) -> Result<SourceIni, SourceLoaderError> {
     let mut loader = crate::loader::load_ini(data).map_err(SourceLoaderError::Load)?;
     let mut result = SourceIni::default();

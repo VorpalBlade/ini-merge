@@ -157,7 +157,7 @@ impl Transformer for TransformKdeShortcut {
 /// only on some systems.
 ///
 /// *NOTE*: This is not meant to be used directly, as special support is
-/// needed elsewhere. Instead use [super::MutationsBuilder::add_setter]
+/// needed elsewhere. Instead use [`super::MutationsBuilder::add_setter`]
 ///
 /// Arguments:
 /// * `raw`: Raw line to set
