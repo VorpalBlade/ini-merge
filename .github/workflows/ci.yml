@@ -86,3 +86,12 @@ jobs:
           save-if: ${{ matrix.features == '--no-default-features --features=keyring' }}
       - name: Compile and test
         run: cargo test ${{ matrix.features }} --verbose
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Rust
+      run: rustup install --profile minimal stable && rustup default stable && rustup component add rustfmt
+    - run: cargo fmt -- --check
