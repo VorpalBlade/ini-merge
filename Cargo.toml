@@ -13,7 +13,7 @@ version = "0.3.4"
 [dependencies]
 ini-roundtrip = "0.1.2"
 itertools = { version = "0.12.0", default-features = false }
-keyring = { version = "2.0.5", optional = true }
+keyring = { version = "2.1.0", optional = true }
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.20" }
 ouroboros = { version = "0.18.0", default-features = false }
