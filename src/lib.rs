@@ -12,6 +12,7 @@
 //!   Formatting is preserved. See [`merge::merge_ini`].
 //! * Filtering of an INI file based on a rule set
 
+#![warn(unreachable_pub)]
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::needless_pass_by_value)]
 #![warn(clippy::redundant_closure_for_method_calls)]
