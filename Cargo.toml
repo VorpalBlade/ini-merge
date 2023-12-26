@@ -8,7 +8,7 @@ license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
 rust-version = "1.70.0"
-version = "0.3.4"
+version = "0.3.5"
 
 [dependencies]
 ini-roundtrip = "0.1.2"
