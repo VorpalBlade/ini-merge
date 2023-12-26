@@ -13,13 +13,20 @@ version = "0.3.4"
 [dependencies]
 ini-roundtrip = "0.1.2"
 itertools = { version = "0.12.0", default-features = false }
-keyring = { version = "2.1.0", optional = true }
+keyring = { version = "2.2.0", optional = true, default-features = false, features = [
+    "linux-secret-service",
+    "platform-freebsd",
+    "platform-windows",
+    "platform-macos",
+] }
 lending-iterator = { version = "0.1.7", default-features = false }
-log = { version = "0.4.20" }
+log = { version = "0.4.20", default-features = false }
 ouroboros = { version = "0.18.1", default-features = false }
 regex = "1.10.2"
-thiserror = "1.0.51"
+thiserror = { version = "1.0.52", default-features = false }
 
 [dev-dependencies]
 indoc = "2.0.4"
-pretty_assertions = "1.4.0"
+pretty_assertions = { version = "1.4.0", default-features = false, features = [
+    "std",
+] }
