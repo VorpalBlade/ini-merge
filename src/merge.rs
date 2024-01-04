@@ -41,7 +41,7 @@ pub enum MergeError {
 struct MergeState {
     /// Buffer building up the merged result
     result: Vec<String>,
-    /// Temporary buffer that may be discarded or appended to [result] depending
+    /// Temporary buffer that may be discarded or appended to [`MergeState::result`] depending
     /// on what follows
     pending_lines: Vec<String>,
     /// All the section names we have seen so far

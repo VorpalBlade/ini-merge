@@ -45,7 +45,7 @@ pub enum FilterError {
 struct FilterState {
     /// Buffer building up the merged result
     result: Vec<String>,
-    /// Temporary buffer that may be discarded or appended to [result] depending
+    /// Temporary buffer that may be discarded or appended to [`FilterState::result`] depending
     /// on what follows
     pending_lines: Vec<String>,
     /// Name of the current section
