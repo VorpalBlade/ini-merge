@@ -2,7 +2,12 @@
 //! random access (instead of the linear processing we do with the target state
 //! INI file).
 use lending_iterator::prelude::*;
-use std::{borrow::Cow, collections::HashMap, io::Read};
+use std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
+    io::Read,
+    ops::Bound,
+};
 use thiserror::Error;
 
 /// Newtype for INI section and key
@@ -57,7 +62,7 @@ pub(crate) struct SourceIni {
     /// A mapping from section header name to the raw line
     section_headers: HashMap<String, String>,
     /// A mapping for all the keys to their parsed value and raw lines
-    values: HashMap<SectionAndKey<'static>, SourceValue>,
+    values: BTreeMap<SectionAndKey<'static>, SourceValue>,
 }
 
 impl SourceIni {
@@ -76,9 +81,14 @@ impl SourceIni {
         &'this self,
         name: &'name str,
     ) -> impl Iterator<Item = (&Cow<'this, str>, &'this SourceValue)> + 'name {
+        let start = Bound::Included(SectionAndKey::new(
+            Cow::Owned(name.to_string()),
+            Cow::Borrowed(""),
+        ));
         self.values
-            .iter()
-            .filter_map(move |(k, v)| if k.0 == name { Some((&k.1, v)) } else { None })
+            .range((start, Bound::Unbounded))
+            .take_while(move |(k, _)| k.0 == name)
+            .map(|(k, v)| (&k.1, v))
     }
 
     /// Get a specific entry for a section & key
