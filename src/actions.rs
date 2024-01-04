@@ -9,12 +9,7 @@ use thiserror::Error;
 /// Handles matching on INI lines and mapping the matches to generic actions
 /// to be performed
 #[derive(Debug)]
-pub struct Actions<Action, SectionAction>
-where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
-    SectionAction: Clone,
-{
+pub struct Actions<Action, SectionAction> {
     /// Actions for whole sections.
     section_actions: HashMap<String, SectionAction>,
     /// Literal matches and associated actions on (section, key)
@@ -26,12 +21,7 @@ where
     regex_actions: Vec<Action>,
 }
 
-impl<Action, SectionAction> Actions<Action, SectionAction>
-where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
-    SectionAction: Clone,
-{
+impl<Action, SectionAction> Actions<Action, SectionAction> {
     /// Create a builder for this struct.
     pub fn builder() -> ActionsBuilder<Action, SectionAction> {
         ActionsBuilder::<Action, SectionAction>::new()
@@ -41,7 +31,13 @@ where
     pub(crate) fn find_section_action(&self, section: &str) -> Option<&SectionAction> {
         self.section_actions.get(section)
     }
+}
 
+impl<Action, SectionAction> Actions<Action, SectionAction>
+where
+    Action: From<SectionAction> + Clone,
+    for<'a> Action: From<&'a SectionAction>,
+{
     /// Lookup if there is an action (or section action) for a specific section
     /// and key
     pub(crate) fn find_action<'this>(
@@ -53,10 +49,12 @@ where
         if let Some(sec_act) = self.find_section_action(section) {
             return Some(Cow::Owned(sec_act.into()));
         }
+        // Then literal actions
         let sec_key = section.to_string() + "\0" + key;
         if let Some(act) = self.literal_actions.get(sec_key.as_str()) {
             return Some(Cow::Borrowed(act));
         }
+        // Finally regex matches
         let re_matches = self.regex_matches.matches(sec_key.as_str());
         if re_matches.matched_any() {
             let matches: Vec<_> = re_matches.iter().collect();
@@ -72,35 +70,20 @@ where
 
 /// Builder for [Actions].
 #[derive(Debug)]
-pub struct ActionsBuilder<Action, SectionAction>
-where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
-    SectionAction: Clone,
-{
+pub struct ActionsBuilder<Action, SectionAction> {
     section_actions: HashMap<String, SectionAction>,
     literal_actions: HashMap<String, Action>,
     regex_matches: Vec<String>,
     regex_actions: Vec<Action>,
 }
 
-impl<Action, SectionAction> Default for ActionsBuilder<Action, SectionAction>
-where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
-    SectionAction: Clone,
-{
+impl<Action, SectionAction> Default for ActionsBuilder<Action, SectionAction> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<Action, SectionAction> ActionsBuilder<Action, SectionAction>
-where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
-    SectionAction: Clone,
-{
+impl<Action, SectionAction> ActionsBuilder<Action, SectionAction> {
     /// Create a new builder
     pub fn new() -> Self {
         Self {
@@ -145,11 +128,7 @@ where
             section: &str,
             key: &str,
             action: Action,
-        ) where
-            Action: From<SectionAction> + Clone,
-            for<'a> Action: From<&'a SectionAction>,
-            SectionAction: Clone,
-        {
+        ) {
             this.regex_actions.push(action);
             this.regex_matches.push(format!("(?:{section})\0(?:{key})"));
         }
