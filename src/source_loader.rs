@@ -72,10 +72,10 @@ impl SourceIni {
     }
 
     /// Get all entries in a section
-    pub(crate) fn section_entries(
-        &self,
-        name: String,
-    ) -> impl Iterator<Item = (&Cow<'_, str>, &'_ SourceValue)> {
+    pub(crate) fn section_entries<'name, 'this: 'name>(
+        &'this self,
+        name: &'name str,
+    ) -> impl Iterator<Item = (&Cow<'this, str>, &'this SourceValue)> + 'name {
         self.values
             .iter()
             .filter_map(move |(k, v)| if k.0 == name { Some((&k.1, v)) } else { None })

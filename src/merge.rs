@@ -92,7 +92,7 @@ impl MergeState {
             match mutations.find_section_action(self.cur_section.as_str()) {
                 None => {
                     let mut unseen_entries: Vec<_> = source
-                        .section_entries(self.cur_section.clone())
+                        .section_entries(&self.cur_section)
                         .filter(|e| !self.seen_keys.contains(e.0.as_ref()))
                         .collect();
                     unseen_entries.sort_by_key(|e| e.0);
@@ -272,7 +272,7 @@ pub(crate) fn merge<'a>(
         state.pending_lines.clear();
 
         state.result.push(raw.clone());
-        for (key, value) in source.section_entries(section.clone()) {
+        for (key, value) in source.section_entries(section) {
             let action = mutations.find_action(section, key);
             state.seen_keys.insert(key.to_string());
             state.emit_kv(action.as_deref(), key, Some(value), None);
