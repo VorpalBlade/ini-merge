@@ -213,18 +213,18 @@ impl Transformer for TransformKdeShortcut {
 #[doc(hidden)]
 #[derive(Debug, Clone)]
 pub struct TransformSet {
-    raw: String,
+    raw: Box<str>,
 }
 
 impl TransformSet {
-    pub fn new(raw: String) -> Self {
+    pub fn new(raw: Box<str>) -> Self {
         Self { raw }
     }
 }
 
 impl Transformer for TransformSet {
     fn call<'a>(&self, _src: &InputData<'a>, _tgt: &InputData<'a>) -> TransformerAction<'a> {
-        TransformerAction::Line(Cow::Owned(self.raw.clone()))
+        TransformerAction::Line(Cow::Owned(self.raw.to_string()))
     }
 
     fn from_user_input(
@@ -237,7 +237,7 @@ impl Transformer for TransformSet {
             args.get("raw")
                 .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get raw entry"))?
-                .to_owned(),
+                .into(),
         ))
     }
 }
@@ -272,12 +272,12 @@ mod keyring_transform {
     /// and enter the password when prompted
     #[derive(Debug, Clone)]
     pub struct TransformKeyring {
-        service: String,
-        user: String,
+        service: Box<str>,
+        user: Box<str>,
     }
 
     impl TransformKeyring {
-        pub fn new(service: String, user: String) -> Self {
+        pub fn new(service: Box<str>, user: Box<str>) -> Self {
             Self { service, user }
         }
     }
@@ -285,7 +285,7 @@ mod keyring_transform {
     impl Transformer for TransformKeyring {
         fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
             let password: Option<_> = {
-                match keyring::Entry::new(self.service.as_str(), self.user.as_str()) {
+                match keyring::Entry::new(&self.service, &self.user) {
                     Ok(entry) => match entry.get_password() {
                         Ok(v) => Some(v),
                         Err(err) => {
@@ -337,7 +337,7 @@ mod keyring_transform {
                 .get("user")
                 .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get user"))?;
-            Ok(Self::new(service.to_string(), user.to_string()))
+            Ok(Self::new(service.into(), user.into()))
         }
     }
 }
@@ -395,7 +395,7 @@ mod tests {
 
     #[test]
     fn set() {
-        let t = TransformSet::new("a = q".to_owned());
+        let t = TransformSet::new("a = q".into());
         let action = t.call(
             &Some(Property {
                 section: "a",

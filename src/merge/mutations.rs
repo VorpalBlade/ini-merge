@@ -146,7 +146,9 @@ impl MutationsBuilder {
             this.action_builder.add_literal_action(
                 &section,
                 &key,
-                Action::Transform(TransformSet::new(key.clone() + separator + value).into()),
+                Action::Transform(
+                    TransformSet::new((key.clone() + separator + value).into()).into(),
+                ),
             );
             this.forced_keys
                 .entry(section)
