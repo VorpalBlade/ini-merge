@@ -5,7 +5,7 @@ use crate::mutations::{
 
 use indoc::indoc;
 use pretty_assertions::assert_eq;
-use std::{collections::VecDeque, rc::Rc};
+use std::collections::VecDeque;
 
 const SOURCE: &str = indoc! {"
     ; Comments are ignored in source
@@ -90,13 +90,13 @@ fn test_merge_ini() {
     mutations.add_literal_action(
         "s1",
         "playmedia",
-        Action::Transform(Rc::new(TransformKdeShortcut)),
+        Action::Transform(TransformKdeShortcut.into()),
     );
     mutations.add_regex_action("s5", ".*_ign", Action::Ignore);
     mutations.add_regex_action(
         "s1",
         "unsorted_.*",
-        Action::Transform(Rc::new(TransformUnsortedLists::new(','))),
+        Action::Transform(TransformUnsortedLists::new(',').into()),
     );
     let mutations = mutations.build().unwrap();
 

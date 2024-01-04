@@ -45,13 +45,62 @@ pub trait Transformer: std::fmt::Debug {
         Self: Sized;
 }
 
+/// Enum to avoid dynamic dispatch
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum TransformerDispatch {
+    UnsortedLists(TransformUnsortedLists),
+    KdeShortcut(TransformKdeShortcut),
+    #[cfg(feature = "keyring")]
+    Keyring(TransformKeyring),
+    #[doc(hidden)]
+    Set(TransformSet),
+}
+
+impl Transformer for TransformerDispatch {
+    fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
+        match self {
+            TransformerDispatch::UnsortedLists(v) => v.call(src, tgt),
+            TransformerDispatch::KdeShortcut(v) => v.call(src, tgt),
+            TransformerDispatch::Set(v) => v.call(src, tgt),
+            #[cfg(feature = "keyring")]
+            TransformerDispatch::Keyring(v) => v.call(src, tgt),
+        }
+    }
+
+    fn from_user_input(
+        _args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
+    ) -> Result<Self, TransformerError>
+    where
+        Self: Sized,
+    {
+        panic!("Can not construct dispatcher from user input. Invalid API usage!");
+    }
+}
+
+macro_rules! dispatch_from {
+    ($type:ty, $name:tt) => {
+        impl From<$type> for TransformerDispatch {
+            fn from(value: $type) -> Self {
+                Self::$name(value)
+            }
+        }
+    };
+}
+
+dispatch_from!(TransformUnsortedLists, UnsortedLists);
+dispatch_from!(TransformKdeShortcut, KdeShortcut);
+dispatch_from!(TransformSet, Set);
+#[cfg(feature = "keyring")]
+dispatch_from!(TransformKeyring, Keyring);
+
 /// Compare the value as an unsorted list.
 ///
 /// Useful because Konversation likes to reorder lists.
 ///
 /// Arguments:
 /// * `separator`: Separating character
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransformUnsortedLists {
     separator: char,
 }
@@ -109,7 +158,7 @@ impl Transformer for TransformUnsortedLists {
 /// ```
 ///
 /// No arguments
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransformKdeShortcut;
 
 impl Transformer for TransformKdeShortcut {
@@ -161,7 +210,8 @@ impl Transformer for TransformKdeShortcut {
 ///
 /// Arguments:
 /// * `raw`: Raw line to set
-#[derive(Debug)]
+#[doc(hidden)]
+#[derive(Debug, Clone)]
 pub struct TransformSet {
     raw: String,
 }
@@ -220,7 +270,7 @@ mod keyring_transform {
     /// $ secret-tool store --label="Descriptive name" service chezmoi-modify-manager username konversation-login
     /// ```
     /// and enter the password when prompted
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct TransformKeyring {
         service: String,
         user: String,

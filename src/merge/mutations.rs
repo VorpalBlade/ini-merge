@@ -5,11 +5,10 @@ use crate::{
     mutations::transforms::TransformSet,
 };
 
-use self::transforms::Transformer;
+use self::transforms::TransformerDispatch;
 use std::{
     borrow::Cow,
     collections::{HashMap, HashSet},
-    rc::Rc,
 };
 
 pub mod transforms;
@@ -23,7 +22,7 @@ pub enum Action {
     /// Remove this entry
     Delete,
     /// Custom transform
-    Transform(Rc<dyn Transformer>),
+    Transform(TransformerDispatch),
 }
 
 impl From<SectionAction> for Action {
@@ -147,7 +146,7 @@ impl MutationsBuilder {
             this.action_builder.add_literal_action(
                 &section,
                 &key,
-                Action::Transform(Rc::new(TransformSet::new(key.clone() + separator + value))),
+                Action::Transform(TransformSet::new(key.clone() + separator + value).into()),
             );
             this.forced_keys
                 .entry(section)

@@ -5,7 +5,7 @@ pub mod mutations;
 #[cfg(test)]
 mod tests;
 
-use self::mutations::{Action, Mutations, SectionAction};
+use self::mutations::{transforms::Transformer, Action, Mutations, SectionAction};
 use crate::{
     loader::{self, Loader},
     source_loader::{self, SectionAndKey, SourceIni, SourceValue},
