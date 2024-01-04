@@ -25,15 +25,6 @@ pub enum MergeError {
     /// An error while loading the source INI
     #[error("Failed to load source INI due to {0}")]
     SourceLoad(#[source] Box<dyn std::error::Error + 'static + Send + Sync>),
-    /// A transformer reported an error
-    #[error("Failed to apply transform {transformer} on {section}->{key} due to {reason}")]
-    TransformerError {
-        /// Transformer being applied
-        transformer: String,
-        section: String,
-        key: String,
-        reason: String,
-    },
 }
 
 /// State tracking for the merge algorithm
