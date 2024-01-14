@@ -143,7 +143,7 @@ mod tests {
 
     use indoc::indoc;
     use pretty_assertions::assert_eq;
-    use std::collections::VecDeque;
+    use std::{borrow::Cow, collections::VecDeque};
 
     /// Test data
     const TEST_DATA: &str = indoc! {"
@@ -203,5 +203,19 @@ mod tests {
                 .unwrap(),
             SourceValue::new("a =   9".into(), Some("9".into()))
         );
+
+        assert_eq!(
+            *result.section_entries("section").collect::<Vec<_>>(),
+            vec![
+                (
+                    &Cow::Borrowed("a"),
+                    &SourceValue::new("a = 2".into(), Some("2".into()))
+                ),
+                (
+                    &Cow::Borrowed("b"),
+                    &SourceValue::new("b = 3".into(), Some("3".into()))
+                )
+            ]
+        )
     }
 }
