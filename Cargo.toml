@@ -21,8 +21,8 @@ keyring = { version = "2.3.1", optional = true, default-features = false, featur
 ] }
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.20", default-features = false }
-ouroboros = { version = "0.18.2", default-features = false }
-regex = "1.10.2"
+ouroboros = { version = "0.18.3", default-features = false }
+regex = "1.10.3"
 thiserror = { version = "1.0.56", default-features = false }
 
 [dev-dependencies]
