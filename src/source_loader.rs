@@ -216,6 +216,6 @@ mod tests {
                     &SourceValue::new("b = 3".into(), Some("3".into()))
                 )
             ]
-        )
+        );
     }
 }
