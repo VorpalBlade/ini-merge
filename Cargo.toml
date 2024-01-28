@@ -3,6 +3,7 @@ authors = ["Arvid Norlander"]
 categories = ["config"]
 description = "Library to merge ini files subject to configuration."
 edition = "2021"
+exclude = ["/.github/", "/.chglog/"]
 keywords = ["ini", "config", "configuration", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
