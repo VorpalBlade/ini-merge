@@ -99,7 +99,7 @@ dispatch_from!(TransformKeyring, Keyring);
 /// Useful because Konversation likes to reorder lists.
 ///
 /// Arguments:
-/// * `separator`: Separating character
+/// * `separator`: Separating character in the list
 #[derive(Debug, Clone)]
 pub struct TransformUnsortedLists {
     separator: char,
@@ -260,6 +260,7 @@ mod keyring_transform {
     /// Arguments:
     /// * `service`: Which service name to look under
     /// * `user`: The user name identifying the entry
+    /// * `separator`: The separator to use between key and value (optional, default is `=`)
     ///
     /// Example args:
     /// * service: "chezmoi-modify-manager"
@@ -274,11 +275,16 @@ mod keyring_transform {
     pub struct TransformKeyring {
         service: Box<str>,
         user: Box<str>,
+        separator: Box<str>,
     }
 
     impl TransformKeyring {
-        pub fn new(service: Box<str>, user: Box<str>) -> Self {
-            Self { service, user }
+        pub fn new(service: Box<str>, user: Box<str>, separator: Box<str>) -> Self {
+            Self {
+                service,
+                user,
+                separator,
+            }
         }
     }
 
@@ -310,14 +316,18 @@ mod keyring_transform {
                 }
             };
             match password {
-                Some(value) => TransformerAction::Line(format!("{key}={value}").into()),
+                Some(value) => {
+                    TransformerAction::Line(format!("{key}{}{value}", self.separator).into())
+                }
                 None => {
                     // Try to copy from target state, useful if updating
                     // remotely over SSH with keyring not unlocked.
                     if let Some(prop) = tgt {
                         TransformerAction::Line(prop.raw.into())
                     } else {
-                        TransformerAction::Line(format!("{key}=<KEYRING ERROR>").into())
+                        TransformerAction::Line(
+                            format!("{key}{}<KEYRING ERROR>", self.separator).into(),
+                        )
                     }
                 }
             }
@@ -337,7 +347,8 @@ mod keyring_transform {
                 .get("user")
                 .map(AsRef::as_ref)
                 .ok_or(TransformerError::Construct("Failed to get user"))?;
-            Ok(Self::new(service.into(), user.into()))
+            let separator = args.get("separator").map(AsRef::as_ref).unwrap_or("=");
+            Ok(Self::new(service.into(), user.into(), separator.into()))
         }
     }
 }
