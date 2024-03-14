@@ -28,7 +28,8 @@ jobs:
           - armv7-unknown-linux-gnueabihf
           - i686-unknown-linux-gnu
           - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-gnu
+          # Disable until cross is fixed
+          #- x86_64-pc-windows-gnu
         rust:
           - stable
           - beta
