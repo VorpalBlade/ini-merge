@@ -117,7 +117,8 @@ impl Transformer for TransformUnsortedLists {
         // At least one of them will exist (or we wouldn't be here).
         match (src, tgt) {
             (None, None) => unreachable!(),
-            (None, Some(val)) | (Some(val), None) => TransformerAction::Line(val.raw.into()),
+            (None, Some(_)) => TransformerAction::Nothing,
+            (Some(val), None) => TransformerAction::Line(val.raw.into()),
             (Some(sval), Some(tval)) => {
                 let ss: HashSet<_> = sval.val.unwrap().split(|x| x == self.separator).collect();
                 let ts: HashSet<_> = tval.val.unwrap().split(|x| x == self.separator).collect();
@@ -167,7 +168,8 @@ impl Transformer for TransformKdeShortcut {
         // At least one of them will exist (or we wouldn't be here).
         match (src, tgt) {
             (None, None) => unreachable!(),
-            (None, Some(val)) | (Some(val), None) => TransformerAction::Line(val.raw.into()),
+            (None, Some(_)) => TransformerAction::Nothing,
+            (Some(val), None) => TransformerAction::Line(val.raw.into()),
             (Some(sval), Some(tval)) => {
                 let src_split: Vec<_> = sval.val.unwrap().split(',').collect();
                 let tgt_split: Vec<_> = tval.val.unwrap().split(',').collect();
