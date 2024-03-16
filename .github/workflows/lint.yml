@@ -1,4 +1,4 @@
-name: rust-clippy analyze
+name: Lint
 
 on:
   push:
@@ -8,6 +8,10 @@ on:
     branches: [ "main" ]
   schedule:
     - cron: '41 20 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   rust-clippy-analyze:
@@ -39,7 +43,7 @@ jobs:
           cargo clippy
           --all-features
           --all-targets
-          --message-format=json | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
+          --message-format=json -- -D warnings | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
@@ -47,3 +51,13 @@ jobs:
         with:
           sarif_file: rust-clippy-results.sarif
           wait-for-processing: true
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Rust
+      run: rustup install --profile minimal stable && rustup default stable && rustup component add rustfmt
+    - run: cargo fmt -- --check
+

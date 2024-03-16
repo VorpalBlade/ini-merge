@@ -1,4 +1,4 @@
-name: Continuous integration
+name: Build
 
 permissions:
   contents: read
@@ -9,8 +9,13 @@ on:
   pull_request:
     branches: [ "main" ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-D warnings"
@@ -49,7 +54,7 @@ jobs:
       - name: Cross test
         run: cross test --target ${{ matrix.target }} --verbose
 
-  exotic-platforms:
+  exotic-os:
     name: Test - ${{ matrix.target }} on ${{ matrix.os }} (stable rust)
     runs-on: ${{ matrix.os }}
     strategy:
@@ -97,11 +102,3 @@ jobs:
       - name: Test
         run: cargo test ${{ matrix.features }} --verbose
 
-  rustfmt:
-    name: Rustfmt
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install Rust
-      run: rustup install --profile minimal stable && rustup default stable && rustup component add rustfmt
-    - run: cargo fmt -- --check
