@@ -237,6 +237,8 @@ pub(crate) fn merge<'a>(
         .filter(|x| !state.seen_sections.contains(x.0))
         .map(|(section, raw)| (section, raw.to_owned()))
         .collect();
+    // Also handle forced keys from `set` directives for sections that don't exist
+    // anywhere.
     unseen_sections.extend(
         mutations
             .forced_keys
