@@ -102,3 +102,15 @@ jobs:
       - name: Test
         run: cargo test ${{ matrix.features }} --verbose
 
+  # Simulate docs.rs
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -Dwarnings
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup install --profile minimal nightly && rustup default nightly
+      - uses: dtolnay/install@cargo-docs-rs
+      - run: cargo docs-rs
