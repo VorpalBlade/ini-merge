@@ -167,6 +167,11 @@ impl MutationsBuilder {
         self
     }
 
+    pub fn warn_on_multiple_matches(&mut self, warn: bool) -> &mut Self {
+        self.action_builder.warn_on_multiple_matches(warn);
+        self
+    }
+
     /// Build the Mutations struct
     ///
     /// Errors if a regex fails to compile.

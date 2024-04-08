@@ -19,6 +19,8 @@ pub struct Actions<Action, SectionAction> {
     regex_matches: RegexSet,
     /// Associated actions for regex matches
     regex_actions: Vec<Action>,
+    /// Warn on multiple matches (default: true)
+    warn_on_multiple_matches: bool,
 }
 
 impl<Action, SectionAction> Actions<Action, SectionAction> {
@@ -58,7 +60,7 @@ where
         let re_matches = self.regex_matches.matches(sec_key.as_str());
         if re_matches.matched_any() {
             let matches: Vec<_> = re_matches.iter().collect();
-            if matches.len() != 1 {
+            if matches.len() != 1 && self.warn_on_multiple_matches {
                 warn!(target: "ini-merge", "Overlapping regex matches for {section}/{key}, first action taken");
             }
             let m = matches.first().unwrap();
@@ -75,6 +77,8 @@ pub struct ActionsBuilder<Action, SectionAction> {
     literal_actions: HashMap<String, Action>,
     regex_matches: Vec<String>,
     regex_actions: Vec<Action>,
+    /// Warn on multiple matches (default: true)
+    warn_on_multiple_matches: bool,
 }
 
 impl<Action, SectionAction> Default for ActionsBuilder<Action, SectionAction> {
@@ -91,6 +95,7 @@ impl<Action, SectionAction> ActionsBuilder<Action, SectionAction> {
             literal_actions: Default::default(),
             regex_matches: Default::default(),
             regex_actions: Default::default(),
+            warn_on_multiple_matches: true,
         }
     }
 
@@ -136,6 +141,12 @@ impl<Action, SectionAction> ActionsBuilder<Action, SectionAction> {
         self
     }
 
+    /// Set if there should be a warning on multiple matches
+    pub fn warn_on_multiple_matches(&mut self, warn: bool) -> &mut Self {
+        self.warn_on_multiple_matches = warn;
+        self
+    }
+
     /// Build the [Actions] struct
     ///
     /// Errors if a regex fails to compile.
@@ -146,6 +157,7 @@ impl<Action, SectionAction> ActionsBuilder<Action, SectionAction> {
             regex_matches: RegexSet::new(self.regex_matches)
                 .map_err(|e| ActionsBuilderError::RegexCompile(Box::new(e)))?,
             regex_actions: self.regex_actions,
+            warn_on_multiple_matches: self.warn_on_multiple_matches,
         })
     }
 }
