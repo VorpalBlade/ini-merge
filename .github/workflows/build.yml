@@ -68,7 +68,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
-        run: rustup install --no-self-update --profile minimal stable && rustup default stable
+        run: |
+          rustup install --no-self-update --profile minimal stable
+          rustup target add ${{ matrix.target }}
+          rustup default stable
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.3
       - name: Compile
