@@ -61,7 +61,8 @@ where
         if re_matches.matched_any() {
             let matches: Vec<_> = re_matches.iter().collect();
             if matches.len() != 1 && self.warn_on_multiple_matches {
-                warn!(target: "ini-merge", "Overlapping regex matches for {section}/{key}, first action taken");
+                warn!(target: "ini-merge",
+                      "Overlapping regex matches for {section}/{key}, first action taken. If this is intentional add the no-warn-multiple-key-matches directive");
             }
             let m = matches.first().unwrap();
             return Some(Cow::Borrowed(self.regex_actions.get(*m).unwrap()));
