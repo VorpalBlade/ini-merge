@@ -124,7 +124,7 @@ impl MergeState {
         action: Option<&Action>,
         key: &str,
         source: Option<&SourceValue>,
-        target: Option<ini_roundtrip::Item>,
+        target: Option<ini_roundtrip::Item<'_>>,
     ) {
         match action {
             None => {

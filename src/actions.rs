@@ -64,8 +64,14 @@ where
                 warn!(target: "ini-merge",
                       "Overlapping regex matches for {section}/{key}, first action taken. If this is intentional add the no-warn-multiple-key-matches directive");
             }
-            let m = matches.first().unwrap();
-            return Some(Cow::Borrowed(self.regex_actions.get(*m).unwrap()));
+            let m = matches
+                .first()
+                .expect("Impossible: At least one match exists");
+            return Some(Cow::Borrowed(
+                self.regex_actions
+                    .get(*m)
+                    .expect("Impossible: At least one action exists for each match"),
+            ));
         }
         None
     }
