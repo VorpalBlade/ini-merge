@@ -145,9 +145,12 @@ impl MergeState {
                     .and_then(|v| crate::Property::try_from_ini(self.cur_section.as_str(), v));
                 let transform_result = transform.call(&src, &tgt);
                 match transform_result {
-                    crate::mutations::transforms::TransformerAction::Nothing => (),
-                    crate::mutations::transforms::TransformerAction::Line(raw_line) => {
+                    Ok(crate::mutations::transforms::TransformerAction::Nothing) => (),
+                    Ok(crate::mutations::transforms::TransformerAction::Line(raw_line)) => {
                         self.result.push(raw_line.into_owned());
+                    }
+                    Err(e) => {
+                        error!(target: "ini-merge", "Failed to transform key {key}: {e}");
                     }
                 }
             }

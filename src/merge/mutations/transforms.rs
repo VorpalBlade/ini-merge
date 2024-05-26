@@ -24,23 +24,35 @@ pub enum TransformerAction<'a> {
 }
 
 /// Error type for loading the source.
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 #[non_exhaustive]
-pub enum TransformerError {
+pub enum TransformerConstructionError {
     #[error("Failed to construct transformer due to {0}")]
     Construct(&'static str),
+}
+
+/// Error type for loading the source.
+#[derive(Debug, Error, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum TransformerCallError {
+    #[error("Invalid data for specific transform: {0}")]
+    InvalidData(&'static str),
 }
 
 /// Trait for transformers operating on the input.
 pub trait Transformer: std::fmt::Debug {
     /// Apply transformer to a property.
     /// The source and target data will always match (i.e. be the same property)
-    fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a>;
+    fn call<'a>(
+        &self,
+        src: &InputData<'a>,
+        tgt: &InputData<'a>,
+    ) -> Result<TransformerAction<'a>, TransformerCallError>;
 
     /// Construct from a mapping of user provided arguments
     fn from_user_input(
         args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-    ) -> Result<Self, TransformerError>
+    ) -> Result<Self, TransformerConstructionError>
     where
         Self: Sized;
 }
@@ -58,7 +70,11 @@ pub enum TransformerDispatch {
 }
 
 impl Transformer for TransformerDispatch {
-    fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
+    fn call<'a>(
+        &self,
+        src: &InputData<'a>,
+        tgt: &InputData<'a>,
+    ) -> Result<TransformerAction<'a>, TransformerCallError> {
         match self {
             TransformerDispatch::UnsortedLists(v) => v.call(src, tgt),
             TransformerDispatch::KdeShortcut(v) => v.call(src, tgt),
@@ -70,7 +86,7 @@ impl Transformer for TransformerDispatch {
 
     fn from_user_input(
         _args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-    ) -> Result<Self, TransformerError>
+    ) -> Result<Self, TransformerConstructionError>
     where
         Self: Sized,
     {
@@ -112,21 +128,37 @@ impl TransformUnsortedLists {
 }
 
 impl Transformer for TransformUnsortedLists {
-    fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
+    fn call<'a>(
+        &self,
+        src: &InputData<'a>,
+        tgt: &InputData<'a>,
+    ) -> Result<TransformerAction<'a>, TransformerCallError> {
         // Deal with case of line in just target or source.
         // At least one of them will exist (or we wouldn't be here).
         match (src, tgt) {
             (None, None) => unreachable!(),
-            (None, Some(_)) => TransformerAction::Nothing,
-            (Some(val), None) => TransformerAction::Line(val.raw.into()),
+            (None, Some(_)) => Ok(TransformerAction::Nothing),
+            (Some(val), None) => Ok(TransformerAction::Line(val.raw.into())),
             (Some(sval), Some(tval)) => {
-                let ss: HashSet<_> = sval.val.unwrap().split(|x| x == self.separator).collect();
-                let ts: HashSet<_> = tval.val.unwrap().split(|x| x == self.separator).collect();
+                let ss: HashSet<_> = sval
+                    .val
+                    .ok_or(TransformerCallError::InvalidData(
+                        "Key is missing value in source",
+                    ))?
+                    .split(|x| x == self.separator)
+                    .collect();
+                let ts: HashSet<_> = tval
+                    .val
+                    .ok_or(TransformerCallError::InvalidData(
+                        "Key is missing value in system",
+                    ))?
+                    .split(|x| x == self.separator)
+                    .collect();
                 // If the sets are equal, return the target line to minimise uneeded diffs
                 if ss == ts {
-                    TransformerAction::Line(tval.raw.into())
+                    Ok(TransformerAction::Line(tval.raw.into()))
                 } else {
-                    TransformerAction::Line(sval.raw.into())
+                    Ok(TransformerAction::Line(sval.raw.into()))
                 }
             }
         }
@@ -134,18 +166,22 @@ impl Transformer for TransformUnsortedLists {
 
     fn from_user_input(
         args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-    ) -> Result<Self, TransformerError>
+    ) -> Result<Self, TransformerConstructionError>
     where
         Self: Sized,
     {
         Ok(Self::new(
             args.get("separator")
                 .map(AsRef::as_ref)
-                .ok_or(TransformerError::Construct("Failed to get separator"))?
+                .ok_or(TransformerConstructionError::Construct(
+                    "Failed to get separator",
+                ))?
                 .chars()
                 .exactly_one()
                 .map_err(|_| {
-                    TransformerError::Construct("Failed to get character from separator")
+                    TransformerConstructionError::Construct(
+                        "Failed to get character from separator",
+                    )
                 })?,
         ))
     }
@@ -163,16 +199,32 @@ impl Transformer for TransformUnsortedLists {
 pub struct TransformKdeShortcut;
 
 impl Transformer for TransformKdeShortcut {
-    fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
+    fn call<'a>(
+        &self,
+        src: &InputData<'a>,
+        tgt: &InputData<'a>,
+    ) -> Result<TransformerAction<'a>, TransformerCallError> {
         // Deal with case of line in just target or source.
         // At least one of them will exist (or we wouldn't be here).
         match (src, tgt) {
             (None, None) => unreachable!(),
-            (None, Some(_)) => TransformerAction::Nothing,
-            (Some(val), None) => TransformerAction::Line(val.raw.into()),
+            (None, Some(_)) => Ok(TransformerAction::Nothing),
+            (Some(val), None) => Ok(TransformerAction::Line(val.raw.into())),
             (Some(sval), Some(tval)) => {
-                let src_split: Vec<_> = sval.val.unwrap().split(',').collect();
-                let tgt_split: Vec<_> = tval.val.unwrap().split(',').collect();
+                let src_split: Vec<_> = sval
+                    .val
+                    .ok_or(TransformerCallError::InvalidData(
+                        "Key is missing value in source",
+                    ))?
+                    .split(',')
+                    .collect();
+                let tgt_split: Vec<_> = tval
+                    .val
+                    .ok_or(TransformerCallError::InvalidData(
+                        "Key is missing value in target",
+                    ))?
+                    .split(',')
+                    .collect();
                 if src_split.len() == tgt_split.len()
                     && src_split.len() == 3
                     && src_split[0] == tgt_split[0]
@@ -180,9 +232,9 @@ impl Transformer for TransformKdeShortcut {
                     && ["", "none"].contains(&src_split[1])
                     && ["", "none"].contains(&tgt_split[1])
                 {
-                    TransformerAction::Line(tval.raw.into())
+                    Ok(TransformerAction::Line(tval.raw.into()))
                 } else {
-                    TransformerAction::Line(sval.raw.into())
+                    Ok(TransformerAction::Line(sval.raw.into()))
                 }
             }
         }
@@ -190,14 +242,16 @@ impl Transformer for TransformKdeShortcut {
 
     fn from_user_input(
         args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-    ) -> Result<Self, TransformerError>
+    ) -> Result<Self, TransformerConstructionError>
     where
         Self: Sized,
     {
         if args.is_empty() {
             Ok(Self)
         } else {
-            Err(TransformerError::Construct("Unexpected arguments"))
+            Err(TransformerConstructionError::Construct(
+                "Unexpected arguments",
+            ))
         }
     }
 }
@@ -225,20 +279,26 @@ impl TransformSet {
 }
 
 impl Transformer for TransformSet {
-    fn call<'a>(&self, _src: &InputData<'a>, _tgt: &InputData<'a>) -> TransformerAction<'a> {
-        TransformerAction::Line(Cow::Owned(self.raw.to_string()))
+    fn call<'a>(
+        &self,
+        _src: &InputData<'a>,
+        _tgt: &InputData<'a>,
+    ) -> Result<TransformerAction<'a>, TransformerCallError> {
+        Ok(TransformerAction::Line(Cow::Owned(self.raw.to_string())))
     }
 
     fn from_user_input(
         args: &HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-    ) -> Result<Self, TransformerError>
+    ) -> Result<Self, TransformerConstructionError>
     where
         Self: Sized,
     {
         Ok(Self::new(
             args.get("raw")
                 .map(AsRef::as_ref)
-                .ok_or(TransformerError::Construct("Failed to get raw entry"))?
+                .ok_or(TransformerConstructionError::Construct(
+                    "Failed to get raw entry",
+                ))?
                 .into(),
         ))
     }
@@ -253,7 +313,7 @@ mod keyring_transform {
 
     use crate::InputData;
 
-    use super::{Transformer, TransformerAction, TransformerError};
+    use super::{Transformer, TransformerAction, TransformerConstructionError};
 
     /// Get value from system keyring (secrets service). Useful for passwords
     /// etc that you do not want in your dotfiles repo, but sync via some more
@@ -291,7 +351,11 @@ mod keyring_transform {
     }
 
     impl Transformer for TransformKeyring {
-        fn call<'a>(&self, src: &InputData<'a>, tgt: &InputData<'a>) -> TransformerAction<'a> {
+        fn call<'a>(
+            &self,
+            src: &InputData<'a>,
+            tgt: &InputData<'a>,
+        ) -> Result<TransformerAction<'a>, super::TransformerCallError> {
             let password: Option<_> = {
                 match keyring::Entry::new(&self.service, &self.user) {
                     Ok(entry) => match entry.get_password() {
@@ -318,18 +382,18 @@ mod keyring_transform {
                 }
             };
             match password {
-                Some(value) => {
-                    TransformerAction::Line(format!("{key}{}{value}", self.separator).into())
-                }
+                Some(value) => Ok(TransformerAction::Line(
+                    format!("{key}{}{value}", self.separator).into(),
+                )),
                 None => {
                     // Try to copy from target state, useful if updating
                     // remotely over SSH with keyring not unlocked.
                     if let Some(prop) = tgt {
-                        TransformerAction::Line(prop.raw.into())
+                        Ok(TransformerAction::Line(prop.raw.into()))
                     } else {
-                        TransformerAction::Line(
+                        Ok(TransformerAction::Line(
                             format!("{key}{}<KEYRING ERROR>", self.separator).into(),
-                        )
+                        ))
                     }
                 }
             }
@@ -337,18 +401,16 @@ mod keyring_transform {
 
         fn from_user_input(
             args: &std::collections::HashMap<impl Borrow<str> + Eq + Hash, impl AsRef<str>>,
-        ) -> Result<Self, TransformerError>
+        ) -> Result<Self, TransformerConstructionError>
         where
             Self: Sized,
         {
-            let service = args
-                .get("service")
-                .map(AsRef::as_ref)
-                .ok_or(TransformerError::Construct("Failed to get service"))?;
-            let user = args
-                .get("user")
-                .map(AsRef::as_ref)
-                .ok_or(TransformerError::Construct("Failed to get user"))?;
+            let service = args.get("service").map(AsRef::as_ref).ok_or(
+                TransformerConstructionError::Construct("Failed to get service"),
+            )?;
+            let user = args.get("user").map(AsRef::as_ref).ok_or(
+                TransformerConstructionError::Construct("Failed to get user"),
+            )?;
             let separator = args.get("separator").map(AsRef::as_ref).unwrap_or("=");
             Ok(Self::new(service.into(), user.into(), separator.into()))
         }
@@ -380,7 +442,48 @@ mod tests {
                 raw: "b=c,a,b",
             }),
         );
-        assert_eq!(action, TransformerAction::Line(Cow::Borrowed("b=c,a,b")));
+        assert_eq!(
+            action,
+            Ok(TransformerAction::Line(Cow::Borrowed("b=c,a,b")))
+        );
+
+        let t = TransformUnsortedLists::new(',');
+        let action = t.call(
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some(""),
+                raw: "b=",
+            }),
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: Some(""),
+                raw: "b=",
+            }),
+        );
+        assert_eq!(action, Ok(TransformerAction::Line(Cow::Borrowed("b="))));
+
+        let action = t.call(
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: None,
+                raw: "b",
+            }),
+            &Some(Property {
+                section: "a",
+                key: "b",
+                val: None,
+                raw: "b",
+            }),
+        );
+        assert_eq!(
+            action,
+            Err(TransformerCallError::InvalidData(
+                "Key is missing value in source"
+            ))
+        );
     }
 
     #[test]
@@ -402,7 +505,9 @@ mod tests {
         );
         assert_eq!(
             action,
-            TransformerAction::Line(Cow::Borrowed("b=none,none,Media volume down"))
+            Ok(TransformerAction::Line(Cow::Borrowed(
+                "b=none,none,Media volume down"
+            )))
         );
     }
 
@@ -425,7 +530,7 @@ mod tests {
         );
         assert_eq!(
             action,
-            TransformerAction::Line(Cow::Owned("a = q".to_owned()))
+            Ok(TransformerAction::Line(Cow::Owned("a = q".to_owned())))
         );
     }
 }
