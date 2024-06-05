@@ -22,7 +22,7 @@ keyring = { version = "2.3.3", optional = true, default-features = false, featur
 ] }
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.21", default-features = false }
-ouroboros = { version = "0.18.3", default-features = false }
+ouroboros = { version = "0.18.4", default-features = false }
 regex = "1.10.4"
 thiserror = { version = "1.0.61", default-features = false }
 
