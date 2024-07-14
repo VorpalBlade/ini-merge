@@ -96,6 +96,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust
         run: rustup install --profile minimal  ${{ matrix.rust }} && rustup default ${{ matrix.rust }}
+      - name: Install dbus
+        run: sudo apt install -y libdbus-1-dev pkg-config
       - name: Cache builds
         uses: Swatinem/rust-cache@v2.7.3
         with:
