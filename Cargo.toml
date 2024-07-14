@@ -25,10 +25,10 @@ vendored = ["keyring?/vendored"]
 ini-roundtrip = "0.1.3"
 itertools = { version = "0.13.0", default-features = false }
 keyring = { version = "3.0.1", optional = true, default-features = false, features = [
-    "sync-secret-service",
-    "crypto-rust",
-    "windows-native",
     "apple-native",
+    "crypto-rust",
+    "sync-secret-service",
+    "windows-native",
 ] }
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.22", default-features = false }
