@@ -17,7 +17,7 @@ pub enum FilterAction {
     /// Remove a matching entry entirely
     Remove,
     /// Replace the *value* of an entry with the given string.
-    /// Separator format (with or without spaces) is auto detected.
+    /// Separator format (with or without spaces) is auto-detected.
     Replace(&'static str),
 }
 

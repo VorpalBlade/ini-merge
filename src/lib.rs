@@ -21,7 +21,7 @@ mod loader;
 pub mod merge;
 mod source_loader;
 
-/// Decribes a property
+/// Describes a property
 ///
 /// This is the type that is passed to mutators.
 #[derive(Debug)]

@@ -7,7 +7,7 @@ use ini_roundtrip::Parser;
 
 /// A loader for INI files. Handles the parser state internally.
 ///
-/// Acts as a *lending* iterator over it's contents to avoid copies when
+/// Acts as a *lending* iterator over its contents to avoid copies when
 /// parsing.
 #[self_referencing]
 pub(crate) struct Loader {
