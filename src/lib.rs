@@ -12,14 +12,14 @@
 //!   Formatting is preserved. See [`merge::merge_ini`].
 //! * Filtering of an INI file based on a rule set
 
+// Re-export sub-module
+pub use merge::mutations;
+
 pub mod actions;
 pub mod filter;
 mod loader;
 pub mod merge;
 mod source_loader;
-
-// Re-export sub-module
-pub use merge::mutations;
 
 /// Decribes a property
 ///

@@ -1,26 +1,29 @@
 //! INI merger functionality
 
-pub mod mutations;
+use std::borrow::Cow;
+use std::collections::HashSet;
+use std::io::Read;
 
-#[cfg(test)]
-mod tests;
+use lending_iterator::prelude::*;
+use log::error;
+use thiserror::Error;
 
-use self::mutations::transforms::Transformer;
-use self::mutations::Action;
-use self::mutations::Mutations;
-use self::mutations::SectionAction;
 use crate::loader::Loader;
 use crate::loader::{self};
 use crate::source_loader::SectionAndKey;
 use crate::source_loader::SourceIni;
 use crate::source_loader::SourceValue;
 use crate::source_loader::{self};
-use lending_iterator::prelude::*;
-use log::error;
-use std::borrow::Cow;
-use std::collections::HashSet;
-use std::io::Read;
-use thiserror::Error;
+
+use self::mutations::transforms::Transformer;
+use self::mutations::Action;
+use self::mutations::Mutations;
+use self::mutations::SectionAction;
+
+pub mod mutations;
+
+#[cfg(test)]
+mod tests;
 
 /// Error type for INI merger
 #[derive(Debug, Error)]

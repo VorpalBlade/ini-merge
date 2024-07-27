@@ -1,12 +1,13 @@
 //! This module handles loading the source INI into a form that is easy for
 //! random access (instead of the linear processing we do with the target state
 //! INI file).
-use lending_iterator::prelude::*;
 use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::io::Read;
 use std::ops::Bound;
+
+use lending_iterator::prelude::*;
 use thiserror::Error;
 
 /// Newtype for INI section and key
@@ -135,14 +136,15 @@ pub(crate) fn load_source_ini(data: &mut impl Read) -> Result<SourceIni, SourceL
 
 #[cfg(test)]
 mod tests {
-    use crate::source_loader::SectionAndKey;
-    use crate::source_loader::SourceValue;
-    use crate::OUTSIDE_SECTION;
+    use std::borrow::Cow;
+    use std::collections::VecDeque;
 
     use indoc::indoc;
     use pretty_assertions::assert_eq;
-    use std::borrow::Cow;
-    use std::collections::VecDeque;
+
+    use crate::source_loader::SectionAndKey;
+    use crate::source_loader::SourceValue;
+    use crate::OUTSIDE_SECTION;
 
     /// Test data
     const TEST_DATA: &str = indoc! {"

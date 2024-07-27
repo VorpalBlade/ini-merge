@@ -6,12 +6,13 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::Hash;
 
-use crate::InputData;
 use itertools::Itertools;
 use thiserror::Error;
 
 #[cfg(feature = "keyring")]
 pub use keyring_transform::TransformKeyring;
+
+use crate::InputData;
 
 /// The action that a transform decides should happen for a line it processes.
 #[derive(Debug, PartialEq, Eq)]
@@ -421,11 +422,11 @@ mod keyring_transform {
 
 #[cfg(test)]
 mod tests {
+    use pretty_assertions::assert_eq;
+
     use crate::Property;
 
     use super::*;
-
-    use pretty_assertions::assert_eq;
 
     #[test]
     fn unsorted_lists() {

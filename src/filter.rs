@@ -1,8 +1,9 @@
 //! INI filtering functionality
 
+use std::io::Read;
+
 use lending_iterator::prelude::*;
 use log::error;
-use std::io::Read;
 use thiserror::Error;
 
 use crate::actions::Actions;
@@ -154,10 +155,10 @@ pub fn filter_ini(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::VecDeque;
 
     use indoc::indoc;
     use pretty_assertions::assert_eq;
-    use std::collections::VecDeque;
 
     use super::FilterAction;
     use super::FilterActionsBuilder;
