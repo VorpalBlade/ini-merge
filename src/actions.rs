@@ -1,6 +1,7 @@
 //! Action matching framework for INI processing
 
-use std::{borrow::Cow, collections::HashMap};
+use std::borrow::Cow;
+use std::collections::HashMap;
 
 use log::warn;
 use regex::RegexSet;

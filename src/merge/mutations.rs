@@ -1,15 +1,14 @@
 //! Define mutations that can be applied to merging
 
-use crate::{
-    actions::{Actions, ActionsBuilder, ActionsBuilderError},
-    mutations::transforms::TransformSet,
-};
+use crate::actions::Actions;
+use crate::actions::ActionsBuilder;
+use crate::actions::ActionsBuilderError;
+use crate::mutations::transforms::TransformSet;
 
 use self::transforms::TransformerDispatch;
-use std::{
-    borrow::Cow,
-    collections::{HashMap, HashSet},
-};
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub mod transforms;
 

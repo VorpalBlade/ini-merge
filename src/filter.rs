@@ -5,10 +5,10 @@ use log::error;
 use std::io::Read;
 use thiserror::Error;
 
-use crate::{
-    actions::{Actions, ActionsBuilder},
-    loader::{self, Loader},
-};
+use crate::actions::Actions;
+use crate::actions::ActionsBuilder;
+use crate::loader::Loader;
+use crate::loader::{self};
 
 /// Operations that can be set for filtering
 #[derive(Debug, Clone, Copy)]
@@ -159,7 +159,8 @@ mod tests {
     use pretty_assertions::assert_eq;
     use std::collections::VecDeque;
 
-    use super::{FilterAction, FilterActionsBuilder};
+    use super::FilterAction;
+    use super::FilterActionsBuilder;
 
     const INPUT: &str = indoc! {"
         ; A comment

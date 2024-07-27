@@ -1,10 +1,10 @@
 //! Define transfomers that can be applied as mutations
 
-use std::{
-    borrow::{Borrow, Cow},
-    collections::{HashMap, HashSet},
-    hash::Hash,
-};
+use std::borrow::Borrow;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::hash::Hash;
 
 use crate::InputData;
 use itertools::Itertools;
@@ -313,7 +313,9 @@ mod keyring_transform {
 
     use crate::InputData;
 
-    use super::{Transformer, TransformerAction, TransformerConstructionError};
+    use super::Transformer;
+    use super::TransformerAction;
+    use super::TransformerConstructionError;
 
     /// Get value from system keyring (secrets service). Useful for passwords
     /// etc that you do not want in your dotfiles repo, but sync via some more

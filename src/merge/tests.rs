@@ -1,7 +1,8 @@
-use crate::mutations::{
-    transforms::{TransformKdeShortcut, TransformUnsortedLists},
-    Action, MutationsBuilder, SectionAction,
-};
+use crate::mutations::transforms::TransformKdeShortcut;
+use crate::mutations::transforms::TransformUnsortedLists;
+use crate::mutations::Action;
+use crate::mutations::MutationsBuilder;
+use crate::mutations::SectionAction;
 
 use indoc::indoc;
 use pretty_assertions::assert_eq;
