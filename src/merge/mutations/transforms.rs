@@ -188,7 +188,8 @@ impl Transformer for TransformUnsortedLists {
     }
 }
 
-/// Specialised transform to handle KDE changing certain global shortcuts back and forth between formats like:
+/// Specialised transform to handle KDE changing certain global shortcuts back
+/// and forth between formats like:
 ///
 /// ```ini
 /// playmedia=none,,Play media playback
@@ -325,13 +326,16 @@ mod keyring_transform {
     /// Arguments:
     /// * `service`: Which service name to look under
     /// * `user`: The username identifying the entry
-    /// * `separator`: The separator to use between key and value (optional, default is `=`)
+    /// * `separator`: The separator to use between key and value (optional,
+    ///   default is `=`)
     ///
     /// Example args:
     /// * service: "chezmoi-modify-manager"
     /// * user: "konversation-login"
     ///
-    /// To add a key compatible with the above service and user run a command like the following:
+    /// To add a key compatible with the above service and user run a command
+    /// like the following:
+    ///
     /// ```console
     /// $ secret-tool store --label="Descriptive name" service chezmoi-modify-manager username konversation-login
     /// ```

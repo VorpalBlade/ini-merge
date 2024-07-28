@@ -46,8 +46,8 @@ pub enum FilterError {
 struct FilterState {
     /// Buffer building up the merged result
     result: Vec<String>,
-    /// Temporary buffer that may be discarded or appended to [`FilterState::result`] depending
-    /// on what follows
+    /// Temporary buffer that may be discarded or appended to
+    /// [`FilterState::result`] depending on what follows
     pending_lines: Vec<String>,
     /// Name of the current section
     cur_section: String,
@@ -85,7 +85,8 @@ impl FilterState {
     /// Emit the pending lines (if any)
     ///
     /// This deals with the case where we are not sure if we will emit anything
-    /// in a given section yet. Comments from such sections might also end up pending.
+    /// in a given section yet. Comments from such sections might also end up
+    /// pending.
     fn emit_pending_lines(&mut self) {
         self.result.append(&mut self.pending_lines);
     }

@@ -42,8 +42,8 @@ pub enum MergeError {
 struct MergeState {
     /// Buffer building up the merged result
     result: Vec<String>,
-    /// Temporary buffer that may be discarded or appended to [`MergeState::result`] depending
-    /// on what follows
+    /// Temporary buffer that may be discarded or appended to
+    /// [`MergeState::result`] depending on what follows
     pending_lines: Vec<String>,
     /// All the section names we have seen so far
     seen_sections: HashSet<String>,
@@ -76,9 +76,9 @@ impl MergeState {
 
     /// Emit the pending section header (if any)
     ///
-    /// This deals with the case of a section missing from the source + an ignore key
-    /// on an entry in that section. Without this, we would emit the entry without
-    /// the section header.
+    /// This deals with the case of a section missing from the source + an
+    /// ignore key on an entry in that section. Without this, we would emit
+    /// the entry without the section header.
     ///
     /// Comments from such sections might also end up pending.
     fn emit_pending_lines(&mut self) {
@@ -128,7 +128,8 @@ impl MergeState {
         }
     }
 
-    /// Emit a key-value line, handling transforms. Ignores are NOT handled here fully.
+    /// Emit a key-value line, handling transforms. Ignores are NOT handled here
+    /// fully.
     fn emit_kv(
         &mut self,
         action: Option<&Action>,
@@ -289,7 +290,8 @@ pub(crate) fn merge<'a>(
     state.result
 }
 
-/// Merge two INI files, giving the merged file as a vector of strings, one per line.
+/// Merge two INI files, giving the merged file as a vector of strings, one per
+/// line.
 pub fn merge_ini(
     target: &mut impl Read,
     source: &mut impl Read,
