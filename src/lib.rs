@@ -12,6 +12,10 @@
 //!   preserved. See [`merge::merge_ini`].
 //! * Filtering of an INI file based on a rule set
 
+/// Re-export keyring
+#[cfg(feature = "keyring")]
+pub use keyring;
+
 // Re-export sub-module
 pub use merge::mutations;
 
