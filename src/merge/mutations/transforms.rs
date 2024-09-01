@@ -330,14 +330,14 @@ mod keyring_transform {
     ///   default is `=`)
     ///
     /// Example args:
-    /// * service: "chezmoi-modify-manager"
-    /// * user: "konversation-login"
+    /// * service: "my_service"
+    /// * user: "my_user"
     ///
     /// To add a key compatible with the above service and user run a command
     /// like the following:
     ///
     /// ```console
-    /// $ secret-tool store --label="Descriptive name" service chezmoi-modify-manager username konversation-login
+    /// $ chezmoi_modify_manager --keyring-set my_service my_user
     /// ```
     /// and enter the password when prompted
     #[derive(Debug, Clone)]
