@@ -146,14 +146,14 @@ impl Transformer for TransformUnsortedLists {
                     .ok_or(TransformerCallError::InvalidData(
                         "Key is missing value in source",
                     ))?
-                    .split(|x| x == self.separator)
+                    .split(self.separator)
                     .collect();
                 let ts: HashSet<_> = tval
                     .val
                     .ok_or(TransformerCallError::InvalidData(
                         "Key is missing value in system",
                     ))?
-                    .split(|x| x == self.separator)
+                    .split(self.separator)
                     .collect();
                 // If the sets are equal, return the target line to minimise uneeded diffs
                 if ss == ts {
