@@ -25,6 +25,7 @@ pub struct Actions<Action, SectionAction> {
 
 impl<Action, SectionAction> Actions<Action, SectionAction> {
     /// Create a builder for this struct.
+    #[must_use]
     pub fn builder() -> ActionsBuilder<Action, SectionAction> {
         ActionsBuilder::<Action, SectionAction>::new()
     }
@@ -96,6 +97,7 @@ impl<Action, SectionAction> Default for ActionsBuilder<Action, SectionAction> {
 
 impl<Action, SectionAction> ActionsBuilder<Action, SectionAction> {
     /// Create a new builder
+    #[must_use]
     pub fn new() -> Self {
         Self {
             section_actions: Default::default(),

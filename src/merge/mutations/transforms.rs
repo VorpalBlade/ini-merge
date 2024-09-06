@@ -74,11 +74,11 @@ impl Transformer for TransformerDispatch {
         tgt: &InputData<'a>,
     ) -> Result<TransformerAction<'a>, TransformerCallError> {
         match self {
-            TransformerDispatch::UnsortedLists(v) => v.call(src, tgt),
-            TransformerDispatch::KdeShortcut(v) => v.call(src, tgt),
-            TransformerDispatch::Set(v) => v.call(src, tgt),
+            Self::UnsortedLists(v) => v.call(src, tgt),
+            Self::KdeShortcut(v) => v.call(src, tgt),
+            Self::Set(v) => v.call(src, tgt),
             #[cfg(feature = "keyring")]
-            TransformerDispatch::Keyring(v) => v.call(src, tgt),
+            Self::Keyring(v) => v.call(src, tgt),
         }
     }
 
@@ -120,7 +120,8 @@ pub struct TransformUnsortedLists {
 }
 
 impl TransformUnsortedLists {
-    pub fn new(separator: char) -> Self {
+    #[must_use]
+    pub const fn new(separator: char) -> Self {
         Self { separator }
     }
 }
@@ -272,7 +273,8 @@ pub struct TransformSet {
 }
 
 impl TransformSet {
-    pub fn new(raw: Box<str>) -> Self {
+    #[must_use]
+    pub const fn new(raw: Box<str>) -> Self {
         Self { raw }
     }
 }
@@ -342,7 +344,8 @@ mod keyring_transform {
     }
 
     impl TransformKeyring {
-        pub fn new(service: Box<str>, user: Box<str>, separator: Box<str>) -> Self {
+        #[must_use]
+        pub const fn new(service: Box<str>, user: Box<str>, separator: Box<str>) -> Self {
             Self {
                 service,
                 user,
@@ -412,7 +415,7 @@ mod keyring_transform {
             let user = args.get("user").map(AsRef::as_ref).ok_or(
                 TransformerConstructionError::Construct("Failed to get user"),
             )?;
-            let separator = args.get("separator").map(AsRef::as_ref).unwrap_or("=");
+            let separator = args.get("separator").map_or("=", AsRef::as_ref);
             Ok(Self::new(service.into(), user.into(), separator.into()))
         }
     }

@@ -32,8 +32,8 @@ impl From<SectionAction> for Action {
 impl From<&SectionAction> for Action {
     fn from(value: &SectionAction) -> Self {
         match value {
-            SectionAction::Ignore => Action::Ignore,
-            SectionAction::Delete => Action::Delete,
+            SectionAction::Ignore => Self::Ignore,
+            SectionAction::Delete => Self::Delete,
         }
     }
 }
@@ -59,6 +59,7 @@ pub struct Mutations {
 
 impl Mutations {
     /// Create a builder for this struct.
+    #[must_use]
     pub fn builder() -> MutationsBuilder {
         MutationsBuilder::new()
     }

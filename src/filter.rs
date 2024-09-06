@@ -19,8 +19,8 @@ pub enum FilterAction {
     Replace(&'static str),
 }
 
-impl From<&'_ FilterAction> for FilterAction {
-    fn from(value: &'_ FilterAction) -> Self {
+impl From<&'_ Self> for FilterAction {
+    fn from(value: &'_ Self) -> Self {
         *value
     }
 }

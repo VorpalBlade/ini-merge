@@ -14,7 +14,7 @@ use thiserror::Error;
 pub(crate) struct SectionAndKey<'a>(Cow<'a, str>, Cow<'a, str>);
 
 impl<'a> SectionAndKey<'a> {
-    pub(crate) fn new(section: Cow<'a, str>, key: Cow<'a, str>) -> Self {
+    pub(crate) const fn new(section: Cow<'a, str>, key: Cow<'a, str>) -> Self {
         Self(section, key)
     }
 }
@@ -38,7 +38,7 @@ pub(crate) enum SourceLoaderError {
 }
 
 impl SourceValue {
-    pub(crate) fn new(raw_line: String, value: Option<String>) -> Self {
+    pub(crate) const fn new(raw_line: String, value: Option<String>) -> Self {
         Self {
             raw_line,
             val: value,

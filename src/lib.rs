@@ -56,7 +56,10 @@ impl<'a> Property<'a> {
     }
 
     /// Convert from INI parser value to Property
-    pub(crate) fn try_from_ini(section: &'a str, value: ini_roundtrip::Item<'a>) -> Option<Self> {
+    pub(crate) const fn try_from_ini(
+        section: &'a str,
+        value: ini_roundtrip::Item<'a>,
+    ) -> Option<Self> {
         if let ini_roundtrip::Item::Property { key, val, raw } = value {
             Some(Property {
                 section,
