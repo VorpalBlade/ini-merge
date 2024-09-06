@@ -22,7 +22,7 @@ keyring = ["dep:keyring"]
 vendored = ["keyring?/vendored"]
 
 [dependencies]
-ini-roundtrip = "0.1.3"
+ini-roundtrip = "0.2.0"
 itertools = { version = "0.13.0", default-features = false }
 keyring = { version = "3.2.1", optional = true, default-features = false, features = [
     "apple-native",
