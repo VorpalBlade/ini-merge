@@ -153,8 +153,8 @@ impl MergeState {
                     .and_then(|v| crate::Property::try_from_ini(self.cur_section.as_str(), v));
                 let transform_result = transform.call(&src, &tgt);
                 match transform_result {
-                    Ok(crate::mutations::transforms::TransformerAction::Nothing) => (),
-                    Ok(crate::mutations::transforms::TransformerAction::Line(raw_line)) => {
+                    Ok(mutations::transforms::TransformerAction::Nothing) => (),
+                    Ok(mutations::transforms::TransformerAction::Line(raw_line)) => {
                         self.result.push(raw_line.into_owned());
                     }
                     Err(e) => {
@@ -292,7 +292,7 @@ pub(crate) fn merge<'a>(
 pub fn merge_ini(
     target: &mut impl Read,
     source: &mut impl Read,
-    mutations: &mutations::Mutations,
+    mutations: &Mutations,
 ) -> Result<Vec<String>, MergeError> {
     let mut target =
         loader::load_ini(target).map_err(|inner| MergeError::TargetLoad(inner.into()))?;
