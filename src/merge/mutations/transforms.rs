@@ -1,18 +1,15 @@
 //! Define transfomers that can be applied as mutations
 
+use crate::InputData;
+use itertools::Itertools;
+#[cfg(feature = "keyring")]
+pub use keyring_transform::TransformKeyring;
 use std::borrow::Borrow;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::Hash;
-
-use itertools::Itertools;
 use thiserror::Error;
-
-#[cfg(feature = "keyring")]
-pub use keyring_transform::TransformKeyring;
-
-use crate::InputData;
 
 /// The action that a transform decides should happen for a line it processes.
 #[derive(Debug, PartialEq, Eq)]
@@ -308,16 +305,13 @@ impl Transformer for TransformSet {
 
 #[cfg(feature = "keyring")]
 mod keyring_transform {
-    use std::borrow::Borrow;
-    use std::hash::Hash;
-
-    use log::error;
-
-    use crate::InputData;
-
     use super::Transformer;
     use super::TransformerAction;
     use super::TransformerConstructionError;
+    use crate::InputData;
+    use log::error;
+    use std::borrow::Borrow;
+    use std::hash::Hash;
 
     /// Get value from system keyring (secrets service). Useful for passwords
     /// etc that you do not want in your dotfiles repo, but sync via some more
@@ -426,11 +420,9 @@ mod keyring_transform {
 
 #[cfg(test)]
 mod tests {
-    use pretty_assertions::assert_eq;
-
-    use crate::Property;
-
     use super::*;
+    use crate::Property;
+    use pretty_assertions::assert_eq;
 
     #[test]
     fn unsorted_lists() {

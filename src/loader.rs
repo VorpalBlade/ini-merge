@@ -1,9 +1,7 @@
-use std::io::Read;
-
+use ini_roundtrip::Parser;
 use lending_iterator::prelude::*;
 use ouroboros::self_referencing;
-
-use ini_roundtrip::Parser;
+use std::io::Read;
 
 /// A loader for INI files. Handles the parser state internally.
 ///

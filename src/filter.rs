@@ -1,15 +1,13 @@
 //! INI filtering functionality
 
-use std::io::Read;
-
-use lending_iterator::prelude::*;
-use log::error;
-use thiserror::Error;
-
 use crate::actions::Actions;
 use crate::actions::ActionsBuilder;
 use crate::loader::Loader;
 use crate::loader::{self};
+use lending_iterator::prelude::*;
+use log::error;
+use std::io::Read;
+use thiserror::Error;
 
 /// Operations that can be set for filtering
 #[derive(Debug, Clone, Copy)]
@@ -156,13 +154,11 @@ pub fn filter_ini(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::VecDeque;
-
-    use indoc::indoc;
-    use pretty_assertions::assert_eq;
-
     use super::FilterAction;
     use super::FilterActionsBuilder;
+    use indoc::indoc;
+    use pretty_assertions::assert_eq;
+    use std::collections::VecDeque;
 
     const INPUT: &str = indoc! {"
         ; A comment

@@ -15,7 +15,6 @@
 /// Re-export keyring
 #[cfg(feature = "keyring")]
 pub use keyring;
-
 // Re-export sub-module
 pub use merge::mutations;
 

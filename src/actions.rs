@@ -1,10 +1,9 @@
 //! Action matching framework for INI processing
 
-use std::borrow::Cow;
-use std::collections::HashMap;
-
 use log::warn;
 use regex::RegexSet;
+use std::borrow::Cow;
+use std::collections::HashMap;
 use thiserror::Error;
 
 /// Handles matching on INI lines and mapping the matches to generic actions
