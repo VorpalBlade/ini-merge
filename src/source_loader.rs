@@ -79,7 +79,7 @@ impl SourceIni {
     pub(crate) fn section_entries<'name, 'this: 'name>(
         &'this self,
         name: &'name str,
-    ) -> impl Iterator<Item = (&Cow<'this, str>, &'this SourceValue)> + 'name {
+    ) -> impl Iterator<Item = (&'this Cow<'this, str>, &'this SourceValue)> + 'name {
         let start = Bound::Included(SectionAndKey::new(
             Cow::Owned(name.to_string()),
             Cow::Borrowed(""),
