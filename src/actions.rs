@@ -38,8 +38,7 @@ impl<Action, SectionAction> Actions<Action, SectionAction> {
 
 impl<Action, SectionAction> Actions<Action, SectionAction>
 where
-    Action: From<SectionAction> + Clone,
-    for<'a> Action: From<&'a SectionAction>,
+    for<'a> Action: From<&'a SectionAction> + From<SectionAction> + Clone,
 {
     /// Lookup if there is an action (or section action) for a specific section
     /// and key
