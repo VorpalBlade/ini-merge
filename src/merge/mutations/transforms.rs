@@ -58,6 +58,7 @@ pub trait Transformer: std::fmt::Debug {
 /// Enum to avoid dynamic dispatch
 #[derive(Debug, Clone)]
 #[non_exhaustive]
+#[allow(variant_size_differences)]
 pub enum TransformerDispatch {
     UnsortedLists(TransformUnsortedLists),
     KdeShortcut(TransformKdeShortcut),
