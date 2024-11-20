@@ -34,7 +34,7 @@ lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.22", default-features = false }
 ouroboros = { version = "0.18.4", default-features = false }
 regex = "1.11.1"
-thiserror = { version = "2.0.1", default-features = false }
+thiserror = { version = "2.0.3", default-features = false }
 
 [dev-dependencies]
 indoc = "2.0.5"
