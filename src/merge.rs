@@ -262,6 +262,8 @@ pub(crate) fn merge<'a>(
     for (section, raw) in unseen_sections {
         if section == crate::OUTSIDE_SECTION {
             // This case is handled above by the Section case for the first section.
+            // For files with no sections, the emit_non_target_lines call at the end handles
+            // this.
             continue;
         }
         match mutations.find_section_action(section) {
