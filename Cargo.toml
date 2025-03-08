@@ -8,7 +8,7 @@ keywords = ["ini", "config", "configuration", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
-rust-version = "1.75.0"
+rust-version = "1.81.0"
 version = "0.6.2"
 
 [features]
@@ -24,20 +24,20 @@ vendored = ["keyring?/vendored"]
 [dependencies]
 ini-roundtrip = "0.2.0"
 itertools = { version = "0.14.0", default-features = false }
-keyring = { version = "3.6.1", optional = true, default-features = false, features = [
+keyring = { version = "3.6.2", optional = true, default-features = false, features = [
     "apple-native",
     "crypto-rust",
     "sync-secret-service",
     "windows-native",
 ] }
 lending-iterator = { version = "0.1.7", default-features = false }
-log = { version = "0.4.25", default-features = false }
+log = { version = "0.4.26", default-features = false }
 ouroboros = { version = "0.18.5", default-features = false }
 regex = "1.11.1"
-thiserror = { version = "2.0.11", default-features = false }
+thiserror = { version = "2.0.12", default-features = false }
 
 [dev-dependencies]
-indoc = "2.0.5"
+indoc = "2.0.6"
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
     "std",
 ] }
