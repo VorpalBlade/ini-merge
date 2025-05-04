@@ -1,6 +1,6 @@
 //! Define transfomers that can be applied as mutations
 
-use crate::InputData;
+use crate::common::InputData;
 use itertools::Itertools;
 #[cfg(feature = "keyring")]
 pub use keyring_transform::TransformKeyring;
@@ -311,7 +311,7 @@ mod keyring_transform {
     use super::Transformer;
     use super::TransformerAction;
     use super::TransformerConstructionError;
-    use crate::InputData;
+    use crate::common::InputData;
     use log::error;
     use std::borrow::Borrow;
     use std::hash::Hash;
@@ -425,7 +425,7 @@ mod keyring_transform {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Property;
+    use crate::common::Property;
     use pretty_assertions::assert_eq;
 
     #[test]
