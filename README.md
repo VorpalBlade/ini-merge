@@ -26,7 +26,7 @@ such INI files. Such a tool is already available: [chezmoi_modify_manager].
 
 ## MSRV
 
-Current minimum supported Rust version is 1.81.0. This may be updated as
+Current minimum supported Rust version is 1.85.0. This may be updated as
 needed. MSRV bump is not considered a semver breaking change.
 
 [chezmoi_modify_manager]: https://github.com/VorpalBlade/chezmoi_modify_manager

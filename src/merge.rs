@@ -1,9 +1,9 @@
 //! INI merger functionality
 
-use self::mutations::transforms::Transformer;
 use self::mutations::Action;
 use self::mutations::Mutations;
 use self::mutations::SectionAction;
+use self::mutations::transforms::Transformer;
 use crate::loader::Loader;
 use crate::loader::{self};
 use crate::source_loader::SectionAndKey;

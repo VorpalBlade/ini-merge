@@ -26,5 +26,5 @@ pub mod merge;
 mod source_loader;
 
 pub use common::InputData;
-pub use common::Property;
 pub use common::OUTSIDE_SECTION;
+pub use common::Property;

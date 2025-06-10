@@ -135,9 +135,9 @@ pub(crate) fn load_source_ini(data: &mut impl Read) -> Result<SourceIni, SourceL
 
 #[cfg(test)]
 mod tests {
+    use crate::OUTSIDE_SECTION;
     use crate::source_loader::SectionAndKey;
     use crate::source_loader::SourceValue;
-    use crate::OUTSIDE_SECTION;
     use indoc::indoc;
     use pretty_assertions::assert_eq;
     use std::borrow::Cow;

@@ -96,7 +96,7 @@ jobs:
           - --no-default-features
           - --no-default-features --features=keyring
         rust:
-          - 1.81.0
+          - 1.85.0
           - stable
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
