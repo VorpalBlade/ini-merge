@@ -33,11 +33,11 @@ keyring = { version = "3.6.3", optional = true, default-features = false, featur
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.28", default-features = false }
 ouroboros = { version = "0.18.5", default-features = false }
-regex = "1.11.2"
-thiserror = { version = "2.0.16", default-features = false }
+regex = "1.12.2"
+thiserror = { version = "2.0.17", default-features = false }
 
 [dev-dependencies]
-indoc = "2.0.6"
+indoc = "2.0.7"
 pretty_assertions = { version = "1.4.1", default-features = false, features = [
     "std",
 ] }
