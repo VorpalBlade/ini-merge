@@ -8,7 +8,7 @@ keywords = ["config", "configuration", "ini", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
-rust-version = "1.85.0"
+rust-version = "1.86.0"
 version = "0.6.2"
 
 [features]
