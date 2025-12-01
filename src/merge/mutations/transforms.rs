@@ -170,6 +170,10 @@ impl Transformer for TransformUnsortedLists {
     where
         Self: Sized,
     {
+        // The code becomes hard to read and ugly if we can't chain.
+        // Allow the lint for exactly_one(). Making the code hard to read is
+        // not a real solution.
+        #[allow(unstable_name_collisions)]
         Ok(Self::new(
             args.get("separator")
                 .map(AsRef::as_ref)
