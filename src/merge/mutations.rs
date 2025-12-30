@@ -95,34 +95,36 @@ impl MutationsBuilder {
         Self::default()
     }
 
-    /// Add an ignore for a given section (exact match)
-    pub fn add_section_action(
+    /// Add an action for a given section (exact match)
+    pub fn add_section_literal_action(
         &mut self,
-        section: impl Into<String>,
+        section: String,
         action: SectionAction,
     ) -> &mut Self {
-        self.action_builder.add_section_action(section, action);
+        self.action_builder
+            .add_section_literal_action(section, action);
+        self
+    }
+
+    /// Add an action for a given section (exact match)
+    pub fn add_section_regex_action(
+        &mut self,
+        section: String,
+        action: SectionAction,
+    ) -> &mut Self {
+        self.action_builder
+            .add_section_regex_action(section, action);
         self
     }
 
     /// Add an action for an exact match of section and key
-    pub fn add_literal_action(
-        &mut self,
-        section: impl Into<String>,
-        key: impl AsRef<str>,
-        action: Action,
-    ) -> &mut Self {
+    pub fn add_literal_action(&mut self, section: String, key: &str, action: Action) -> &mut Self {
         self.action_builder.add_literal_action(section, key, action);
         self
     }
 
     /// Add an action for a regex match of a section and key
-    pub fn add_regex_action(
-        &mut self,
-        section: impl AsRef<str>,
-        key: impl AsRef<str>,
-        action: Action,
-    ) -> &mut Self {
+    pub fn add_regex_action(&mut self, section: &str, key: &str, action: Action) -> &mut Self {
         self.action_builder.add_regex_action(section, key, action);
         self
     }
@@ -130,10 +132,10 @@ impl MutationsBuilder {
     /// Add a forced set.
     pub fn add_setter(
         &mut self,
-        section: impl Into<String>,
-        key: impl Into<String>,
-        value: impl AsRef<str>,
-        separator: impl AsRef<str>,
+        section: String,
+        key: String,
+        value: &str,
+        separator: &str,
     ) -> &mut Self {
         fn inner(
             this: &mut MutationsBuilder,
@@ -143,7 +145,7 @@ impl MutationsBuilder {
             separator: &str,
         ) {
             this.action_builder.add_literal_action(
-                &section,
+                section.clone(),
                 &key,
                 Action::Transform(
                     TransformSet::new((key.clone() + separator + value).into()).into(),
@@ -156,13 +158,7 @@ impl MutationsBuilder {
                 })
                 .or_insert_with(|| HashSet::from_iter([key]));
         }
-        inner(
-            self,
-            section.into(),
-            key.into(),
-            value.as_ref(),
-            separator.as_ref(),
-        );
+        inner(self, section, key, value, separator);
         self
     }
 

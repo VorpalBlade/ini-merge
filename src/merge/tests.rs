@@ -84,11 +84,11 @@ fn test_merge_ini() {
 
     // Test a bunch of different actions and matchers.
     let mut mutations = MutationsBuilder::new();
-    mutations.add_section_action("s3", SectionAction::Ignore);
-    mutations.add_literal_action("s1", "c", Action::Ignore);
-    mutations.add_literal_action("s2", "e", Action::Ignore);
+    mutations.add_section_literal_action("s3".into(), SectionAction::Ignore);
+    mutations.add_literal_action("s1".into(), "c", Action::Ignore);
+    mutations.add_literal_action("s2".into(), "e", Action::Ignore);
     mutations.add_literal_action(
-        "s1",
+        "s1".into(),
         "playmedia",
         Action::Transform(TransformKdeShortcut.into()),
     );

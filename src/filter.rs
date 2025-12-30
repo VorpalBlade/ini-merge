@@ -220,8 +220,8 @@ mod tests {
 
         // Test a bunch of different actions and matchers.
         let mut actions = FilterActionsBuilder::new();
-        actions.add_section_action("s4", FilterAction::Remove);
-        actions.add_literal_action("s5", "b", FilterAction::Remove);
+        actions.add_section_literal_action("s4".into(), FilterAction::Remove);
+        actions.add_literal_action("s5".into(), "b", FilterAction::Remove);
         // Note: priority is not guaranteed when there are overlapping matches
         actions.add_regex_action(".*", ".*_replaced", FilterAction::Replace("HIDDEN"));
         actions.add_regex_action(".*", ".*_removed", FilterAction::Remove);
