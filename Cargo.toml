@@ -8,7 +8,7 @@ keywords = ["config", "configuration", "ini", "merge"]
 license = "LGPL-3.0-only"
 name = "ini-merge"
 repository = "https://github.com/VorpalBlade/ini-merge"
-rust-version = "1.86.0"
+rust-version = "1.90.0"
 version = "0.7.0"
 
 [features]
@@ -33,8 +33,8 @@ keyring = { version = "3.6.3", optional = true, default-features = false, featur
 lending-iterator = { version = "0.1.7", default-features = false }
 log = { version = "0.4.29", default-features = false }
 ouroboros = { version = "0.18.5", default-features = false }
-regex = "1.12.2"
-thiserror = { version = "2.0.17", default-features = false }
+regex = "1.12.3"
+thiserror = { version = "2.0.18", default-features = false }
 
 [dev-dependencies]
 indoc = "2.0.7"
