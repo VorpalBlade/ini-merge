@@ -23,7 +23,7 @@ vendored = ["keyring?/vendored"]
 
 [dependencies]
 ini-roundtrip = "0.2.1"
-itertools = { version = "0.14.0", default-features = false }
+itertools = { version = "0.15.0", default-features = false }
 keyring = { version = "3.6.3", optional = true, default-features = false, features = [
     "apple-native",
     "crypto-rust",
@@ -31,9 +31,9 @@ keyring = { version = "3.6.3", optional = true, default-features = false, featur
     "windows-native",
 ] }
 lending-iterator = { version = "0.1.7", default-features = false }
-log = { version = "0.4.29", default-features = false }
+log = { version = "0.4.33", default-features = false }
 ouroboros = { version = "0.18.5", default-features = false }
-regex = "1.12.3"
+regex = "1.13.1"
 thiserror = { version = "2.0.18", default-features = false }
 
 [dev-dependencies]
